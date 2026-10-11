@@ -1,5 +1,9 @@
 """Non-destructive source discovery; public logs contain metadata, not full pages."""
 import json,re,time,urllib.request,urllib.robotparser,urllib.error
+import sys
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from src.collectors.dom import DOM
 from urllib.parse import urljoin,urlsplit
 from html.parser import HTMLParser
 AGENT='RussiaDemandResearch/0.2 (+https://github.com/akaemov/ai-intelligence-service-arc)'
@@ -32,10 +36,25 @@ def inspect(base):
   report['home_allowed']=rp.can_fetch(AGENT,base)
   if not report['home_allowed']:return report
   status,text=get(base);p=Parser();p.feed(text);report['http']=status
+  tree=DOM(text).root
+  relevant=[a for a in tree.nodes('a') if re.search(r'/tenders/[^/]+-\d+/?$|/freelance/[^/]+/[^/]+-\d+/?$',a.attrs.get('href',''))]
+  report['request_links']=[{'url':urljoin(base,a.attrs['href']),'title':a.text()[:180],'parent_class':a.parent.attrs.get('class','')} for a in relevant[:12]]
+  if relevant:
+   detail=urljoin(base,relevant[0].attrs['href']);report['detail_allowed']=rp.can_fetch(AGENT,detail)
+   if report['detail_allowed']:
+    ds,dt=get(detail);d=DOM(dt).root
+    report['detail']={'url':detail,'http':ds,'headings':[n.text()[:160] for n in d.nodes('h1')],
+      'time_fields':[n.attrs for n in d.nodes('time')],
+      'metadata':{n.attrs.get('property') or n.attrs.get('name'):n.attrs.get('content') for n in d.nodes('meta') if any(x in (n.attrs.get('property','')+n.attrs.get('name','')).lower() for x in ['published','modified','date'])},
+      'classes':sorted(Parser().classes.items())}
+    dp=Parser();dp.feed(dt);report['detail']['classes']=sorted(dp.classes.items(),key=lambda x:-x[1])[:45]
+    text_only=' '.join(d.text().split())
+    report['detail']['field_snippets']=[text_only[max(0,m.start()-20):m.end()+100] for m in re.finditer(r'Бюджет|Опубликован|Дата публикации|Заказчик|Местоположение|Место выполнения|Город|Россия|Росси[ияю]|Создан',text_only)][:15]
+
   candidates=[]
   for href,title in p.links:
    url=urljoin(base,href)
-   if urlsplit(url).hostname==urlsplit(base).hostname and re.search(r'tenders|market|jobs|projects|opendata|api',href,re.I):
+   if urlsplit(url).hostname==urlsplit(base).hostname and re.search(r'tenders|market|jobs|projects|opendata|api|freelance',href,re.I):
     if url not in candidates:candidates.append(url)
   report['discovered_links']=candidates[:12]
   # Follow first public index discovered in homepage HTML, not guessed paths.
@@ -49,7 +68,7 @@ def inspect(base):
    report.setdefault('pages',[]).append(entry)
  except Exception as e:report['error']=type(e).__name__+(' HTTP '+str(e.code) if hasattr(e,'code') else '')
  return report
-for base in ['https://workspace.ru/','https://www.b2b-center.ru/','https://www.fl.ru/','https://www.weblancer.net/','https://trudvsem.ru/']:
+for base in ['https://workspace.ru/','https://www.weblancer.net/']:
  result=json.dumps(inspect(base),ensure_ascii=False)
  print(result,flush=True)
  print('::notice title=Source discovery::'+result.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
