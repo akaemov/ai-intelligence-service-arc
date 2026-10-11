@@ -1,0 +1,1184 @@
+{
+  "run": {
+    "id": "733f85ea-eb6b-44e7-bcca-b94243bf9a1b",
+    "started_at": "2026-10-11T13:22:01.376917+00:00",
+    "config": {
+      "region": "Республика Башкортостан",
+      "cities": [
+        "Уфа",
+        "Стерлитамак",
+        "Салават",
+        "Нефтекамск",
+        "Октябрьский",
+        "Белорецк",
+        "Ишимбай",
+        "Туймазы",
+        "Кумертау",
+        "Бирск"
+      ],
+      "days": 90,
+      "compare_days": 90,
+      "services": [
+        "marketing",
+        "advertising",
+        "ai",
+        "research"
+      ],
+      "groups": [
+        "vacancies",
+        "media",
+        "procurement"
+      ],
+      "max_requests": 30,
+      "max_pages": 10,
+      "max_seconds": 180,
+      "max_api_budget": 0,
+      "llm": {
+        "enabled": false,
+        "provider": null,
+        "model": null
+      },
+      "sources": [
+        {
+          "id": "hh",
+          "name": "HeadHunter",
+          "url": "https://api.hh.ru",
+          "category": "vacancies",
+          "coverage": "регион из актуального справочника /areas",
+          "access": "official_api",
+          "authorization": false,
+          "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL"
+        },
+        {
+          "id": "bashinform",
+          "name": "Башинформ",
+          "url": "https://www.bashinform.ru/",
+          "category": "media",
+          "coverage": "Башкортостан; проверяется по каждому материалу",
+          "access": "rss_discovery",
+          "authorization": false,
+          "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки"
+        },
+        {
+          "id": "rbc",
+          "name": "РБК",
+          "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "category": "media",
+          "coverage": "Россия; без регионального основания только контекст",
+          "access": "rss",
+          "authorization": false,
+          "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки"
+        },
+        {
+          "id": "eis",
+          "name": "ЕИС закупки",
+          "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+          "category": "procurement",
+          "coverage": "Россия; регион подтверждается текстом карточки",
+          "access": "public_html",
+          "authorization": false,
+          "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса"
+        }
+      ]
+    },
+    "period_start": "2026-07-13T13:22:01.376917+00:00",
+    "period_end": "2026-10-11T13:22:01.376917+00:00",
+    "status": "partial",
+    "llm_status": "disabled",
+    "api_spend": 0,
+    "currency": "RUB",
+    "finished_at": "2026-10-11T13:22:33.859405+00:00",
+    "requests": 5,
+    "pages": 2
+  },
+  "coverage": [
+    {
+      "id": "hh",
+      "name": "HeadHunter",
+      "url": "https://api.hh.ru",
+      "category": "vacancies",
+      "coverage": "регион из актуального справочника /areas",
+      "access": "official_api",
+      "authorization": false,
+      "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+      "status": "blocked",
+      "last_success_at": null,
+      "error": "HTTPError HTTP 403: доступ к поиску/API отклонён (HTTP 403)",
+      "collected": 0,
+      "accepted": 0
+    },
+    {
+      "id": "bashinform",
+      "name": "Башинформ",
+      "url": "https://www.bashinform.ru/",
+      "category": "media",
+      "coverage": "Башкортостан; проверяется по каждому материалу",
+      "access": "rss_discovery",
+      "authorization": false,
+      "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки",
+      "status": "ok",
+      "last_success_at": "2026-10-11T13:22:01.376917+00:00",
+      "error": null,
+      "collected": 27,
+      "accepted": 1,
+      "method": "Заголовки открытой главной; даты из URL с точностью до дня; архив не обследован",
+      "verified_page_url": "https://www.bashinform.ru/",
+      "rss_status": "not_discovered"
+    },
+    {
+      "id": "rbc",
+      "name": "РБК",
+      "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+      "category": "media",
+      "coverage": "Россия; без регионального основания только контекст",
+      "access": "rss",
+      "authorization": false,
+      "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки",
+      "status": "ok",
+      "last_success_at": "2026-10-11T13:22:01.376917+00:00",
+      "error": null,
+      "collected": 30,
+      "accepted": 0,
+      "verified_feed_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+      "method": "RSS: не более 150 текущих элементов; архив не обследован"
+    },
+    {
+      "id": "eis",
+      "name": "ЕИС закупки",
+      "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+      "category": "procurement",
+      "coverage": "Россия; регион подтверждается текстом карточки",
+      "access": "public_html",
+      "authorization": false,
+      "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+      "status": "error",
+      "last_success_at": null,
+      "error": "HTTPError HTTP 503: сбор не выполнен; проверьте доступ, формат и лимиты",
+      "collected": 0,
+      "accepted": 0
+    }
+  ],
+  "summary": {
+    "categories": {
+      "marketing": {
+        "signals": {},
+        "evidence_ids": [],
+        "direct_b2b_events": null,
+        "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+        "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+      },
+      "advertising": {
+        "signals": {},
+        "evidence_ids": [],
+        "direct_b2b_events": null,
+        "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+        "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+      },
+      "ai": {
+        "signals": {},
+        "evidence_ids": [],
+        "direct_b2b_events": null,
+        "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+        "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+      },
+      "research": {
+        "signals": {},
+        "evidence_ids": [],
+        "direct_b2b_events": null,
+        "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+        "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+      }
+    },
+    "direct_b2b_events": null,
+    "audience": {},
+    "geography": [
+      {
+        "city": "Уфа",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Стерлитамак",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Салават",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Нефтекамск",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Октябрьский",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Белорецк",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Ишимбай",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Туймазы",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Кумертау",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      },
+      {
+        "city": "Бирск",
+        "observations": null,
+        "unit": "уникальные наблюдения",
+        "limitation": "Нет данных не означает отсутствие спроса"
+      }
+    ],
+    "unique_observations": 1,
+    "duplicates_removed": 0,
+    "verified_sources": 2,
+    "opportunities": [],
+    "swot": {
+      "object": "Выход поставщика услуг на рынок Башкортостана",
+      "strengths": null,
+      "weaknesses": null,
+      "opportunities": [],
+      "threats": [],
+      "limitation": "Сведения о конкретном поставщике отсутствуют; внешние угрозы не установлены"
+    },
+    "comparison": {
+      "comparable": false,
+      "new": 0,
+      "changed": 0,
+      "reason": "Дельта сохранённых наблюдений; тренд не рассчитывается: требуются завершённые сопоставимые окна и стабильное покрытие",
+      "requested_compare_days": 90
+    },
+    "limitations": [
+      "Обследованы только перечисленные источники, не весь рынок",
+      "Поисковая частотность не подключена; покупателей и денежный объём рынка не оцениваем",
+      "Бюджеты и цены не извлечены — нет данных; зарплаты вакансий не бюджеты услуг",
+      "LLM-интерпретация и перевод отключены; факты и подсчёты выполняются программно",
+      "Автоматический анализ требований, отраслей, отзывов и опросов не подключён",
+      "Период RSS ограничен доступной лентой, HH — последними 30 днями",
+      "Неполное покрытие: спрос неизвестен"
+    ]
+  },
+  "observations": [
+    {
+      "observation_id": "582b5824-0a18-52c4-b5b0-98a533125954",
+      "run_id": "733f85ea-eb6b-44e7-bcca-b94243bf9a1b",
+      "source_name": "Башинформ",
+      "source_type": "media",
+      "source_url": "https://www.bashinform.ru/news/social/2026-10-09/na-forume-tehnologii-dobra-obsudyat-iskusstvennyy-intellekt-i-fandrayzing-dlya-nko-4669105?erid=2VtzqwgXVEd",
+      "canonical_url": "https://www.bashinform.ru/news/social/2026-10-09/na-forume-tehnologii-dobra-obsudyat-iskusstvennyy-intellekt-i-fandrayzing-dlya-nko-4669105?erid=2VtzqwgXVEd",
+      "title": "На форуме «Технологии Добра» обсудят искусственный интеллект и фандрайзинг для НКО 09 Октября | Общество",
+      "published_at": "2026-10-09T00:00:00+00:00",
+      "collected_at": "2026-10-11T13:22:01.376917+00:00",
+      "original_language": "ru",
+      "region": null,
+      "city_or_district": null,
+      "geography_evidence": null,
+      "organization_name": null,
+      "customer_segment": null,
+      "industry": null,
+      "service_category": "ai",
+      "signal_type": "E",
+      "customer_problem": null,
+      "requested_service": null,
+      "explicit_budget": null,
+      "currency": null,
+      "budget_basis": null,
+      "price_type": null,
+      "procurement_status": null,
+      "short_evidence_excerpt": "На форуме «Технологии Добра» обсудят искусственный интеллект и фандрайзинг для НКО 09 Октября | Общество",
+      "factual_summary": "На форуме «Технологии Добра» обсудят искусственный интеллект и фандрайзинг для НКО 09 Октября | Общество",
+      "analyst_interpretation": null,
+      "confidence_level": "low",
+      "confidence_reason": "Заголовок и метаданные источника; покупательское намерение не выводится из популярности",
+      "content_hash": "ca8c602367fffd246da296f9321956c23dece0468bc300044c6afcb602404915",
+      "duplicate_group_id": null,
+      "limitations": [
+        "Автоматическая классификация; необходима ручная проверка перед коммерческим решением",
+        "Основание даты: дата в URL издателя (точность до дня)",
+        "URL содержит рекламную маркировку erid; публикация не доказательство покупательского намерения",
+        "Нет подтверждённой региональной связи"
+      ],
+      "signal_subtype": null,
+      "survey": null,
+      "regional_eligible": false
+    }
+  ],
+  "history": [
+    {
+      "run": {
+        "id": "54c27ac1-dde8-4deb-932c-9ae20b89dc89",
+        "started_at": "2026-10-11T13:12:33.102594+00:00",
+        "config": {
+          "region": "Республика Башкортостан",
+          "cities": [
+            "Уфа",
+            "Стерлитамак",
+            "Салават",
+            "Нефтекамск",
+            "Октябрьский",
+            "Белорецк",
+            "Ишимбай",
+            "Туймазы",
+            "Кумертау",
+            "Бирск"
+          ],
+          "days": 90,
+          "compare_days": 90,
+          "services": [
+            "marketing",
+            "advertising",
+            "ai",
+            "research"
+          ],
+          "groups": [
+            "vacancies",
+            "media",
+            "procurement"
+          ],
+          "max_requests": 30,
+          "max_pages": 10,
+          "max_seconds": 180,
+          "max_api_budget": 0,
+          "llm": {
+            "enabled": false,
+            "provider": null,
+            "model": null
+          },
+          "sources": [
+            {
+              "id": "hh",
+              "name": "HeadHunter",
+              "url": "https://api.hh.ru",
+              "category": "vacancies",
+              "coverage": "регион из актуального справочника /areas",
+              "access": "official_api",
+              "authorization": false,
+              "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL"
+            },
+            {
+              "id": "bashinform",
+              "name": "Башинформ",
+              "url": "https://www.bashinform.ru/",
+              "category": "media",
+              "coverage": "Башкортостан; проверяется по каждому материалу",
+              "access": "rss_discovery",
+              "authorization": false,
+              "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки"
+            },
+            {
+              "id": "rbc",
+              "name": "РБК",
+              "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+              "category": "media",
+              "coverage": "Россия; без регионального основания только контекст",
+              "access": "rss",
+              "authorization": false,
+              "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки"
+            },
+            {
+              "id": "eis",
+              "name": "ЕИС закупки",
+              "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+              "category": "procurement",
+              "coverage": "Россия; регион подтверждается текстом карточки",
+              "access": "public_html",
+              "authorization": false,
+              "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса"
+            }
+          ]
+        },
+        "period_start": "2026-07-13T13:12:33.102594+00:00",
+        "period_end": "2026-10-11T13:12:33.102594+00:00",
+        "status": "partial",
+        "llm_status": "disabled",
+        "api_spend": 0,
+        "currency": "RUB",
+        "finished_at": "2026-10-11T13:14:11.586981+00:00",
+        "requests": 8,
+        "pages": 2
+      },
+      "coverage": [
+        {
+          "id": "hh",
+          "name": "HeadHunter",
+          "url": "https://api.hh.ru",
+          "category": "vacancies",
+          "coverage": "регион из актуального справочника /areas",
+          "access": "official_api",
+          "authorization": false,
+          "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+          "status": "error",
+          "last_success_at": null,
+          "error": "ValueError: collection failed; inspect adapter and limits",
+          "collected": 0,
+          "accepted": 0
+        },
+        {
+          "id": "bashinform",
+          "name": "Башинформ",
+          "url": "https://www.bashinform.ru/",
+          "category": "media",
+          "coverage": "Башкортостан; проверяется по каждому материалу",
+          "access": "rss_discovery",
+          "authorization": false,
+          "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки",
+          "status": "error",
+          "last_success_at": null,
+          "error": "ValueError: collection failed; inspect adapter and limits",
+          "collected": 0,
+          "accepted": 0
+        },
+        {
+          "id": "rbc",
+          "name": "РБК",
+          "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "category": "media",
+          "coverage": "Россия; без регионального основания только контекст",
+          "access": "rss",
+          "authorization": false,
+          "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки",
+          "status": "ok",
+          "last_success_at": "2026-10-11T13:12:33.102594+00:00",
+          "error": null,
+          "collected": 30,
+          "accepted": 0,
+          "verified_feed_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "method": "RSS headings, at most 150 available entries; not an archive search"
+        },
+        {
+          "id": "eis",
+          "name": "ЕИС закупки",
+          "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+          "category": "procurement",
+          "coverage": "Россия; регион подтверждается текстом карточки",
+          "access": "public_html",
+          "authorization": false,
+          "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+          "status": "error",
+          "last_success_at": null,
+          "error": "HTTPError: collection failed; inspect adapter and limits",
+          "collected": 0,
+          "accepted": 0
+        }
+      ],
+      "summary": {
+        "categories": {
+          "marketing": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "advertising": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "ai": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "research": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          }
+        },
+        "direct_b2b_events": null,
+        "audience": {},
+        "geography": [
+          {
+            "city": "Уфа",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Стерлитамак",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Салават",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Нефтекамск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Октябрьский",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Белорецк",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Ишимбай",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Туймазы",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Кумертау",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Бирск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          }
+        ],
+        "unique_observations": 0,
+        "duplicates_removed": 0,
+        "verified_sources": 1,
+        "opportunities": [],
+        "swot": {
+          "object": "Выход поставщика услуг на рынок Башкортостана",
+          "strengths": null,
+          "weaknesses": null,
+          "opportunities": [],
+          "threats": [],
+          "limitation": "Сведения о конкретном поставщике отсутствуют; внешние угрозы не установлены"
+        },
+        "comparison": {
+          "comparable": false,
+          "new": 0,
+          "changed": 0,
+          "reason": "Дельта сохранённых наблюдений; тренд не рассчитывается: требуются завершённые сопоставимые окна и стабильное покрытие",
+          "requested_compare_days": 90
+        },
+        "limitations": [
+          "Обследованы только перечисленные источники, не весь рынок",
+          "Поисковая частотность не подключена; покупателей и денежный объём рынка не оцениваем",
+          "Бюджеты и цены не извлечены — нет данных; зарплаты вакансий не бюджеты услуг",
+          "LLM-интерпретация и перевод отключены; факты и подсчёты выполняются программно",
+          "Автоматический анализ требований, отраслей, отзывов и опросов не подключён",
+          "Период RSS ограничен доступной лентой, HH — последними 30 днями",
+          "Неполное покрытие: спрос неизвестен"
+        ]
+      }
+    },
+    {
+      "run": {
+        "id": "59f126b1-dc4d-4b38-bb66-3ef85a3ee41f",
+        "started_at": "2026-10-11T13:15:46.770776+00:00",
+        "config": {
+          "region": "Республика Башкортостан",
+          "cities": [
+            "Уфа",
+            "Стерлитамак",
+            "Салават",
+            "Нефтекамск",
+            "Октябрьский",
+            "Белорецк",
+            "Ишимбай",
+            "Туймазы",
+            "Кумертау",
+            "Бирск"
+          ],
+          "days": 90,
+          "compare_days": 90,
+          "services": [
+            "marketing",
+            "advertising",
+            "ai",
+            "research"
+          ],
+          "groups": [
+            "vacancies",
+            "media",
+            "procurement"
+          ],
+          "max_requests": 30,
+          "max_pages": 10,
+          "max_seconds": 180,
+          "max_api_budget": 0,
+          "llm": {
+            "enabled": false,
+            "provider": null,
+            "model": null
+          },
+          "sources": [
+            {
+              "id": "hh",
+              "name": "HeadHunter",
+              "url": "https://api.hh.ru",
+              "category": "vacancies",
+              "coverage": "регион из актуального справочника /areas",
+              "access": "official_api",
+              "authorization": false,
+              "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL"
+            },
+            {
+              "id": "bashinform",
+              "name": "Башинформ",
+              "url": "https://www.bashinform.ru/",
+              "category": "media",
+              "coverage": "Башкортостан; проверяется по каждому материалу",
+              "access": "rss_discovery",
+              "authorization": false,
+              "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки"
+            },
+            {
+              "id": "rbc",
+              "name": "РБК",
+              "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+              "category": "media",
+              "coverage": "Россия; без регионального основания только контекст",
+              "access": "rss",
+              "authorization": false,
+              "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки"
+            },
+            {
+              "id": "eis",
+              "name": "ЕИС закупки",
+              "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+              "category": "procurement",
+              "coverage": "Россия; регион подтверждается текстом карточки",
+              "access": "public_html",
+              "authorization": false,
+              "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса"
+            }
+          ]
+        },
+        "period_start": "2026-07-13T13:15:46.770776+00:00",
+        "period_end": "2026-10-11T13:15:46.770776+00:00",
+        "status": "partial",
+        "llm_status": "disabled",
+        "api_spend": 0,
+        "currency": "RUB",
+        "finished_at": "2026-10-11T13:16:16.819243+00:00",
+        "requests": 6,
+        "pages": 2
+      },
+      "coverage": [
+        {
+          "id": "hh",
+          "name": "HeadHunter",
+          "url": "https://api.hh.ru",
+          "category": "vacancies",
+          "coverage": "регион из актуального справочника /areas",
+          "access": "official_api",
+          "authorization": false,
+          "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+          "status": "blocked",
+          "last_success_at": null,
+          "error": "HTTPError HTTP 403: network access denied",
+          "collected": 0,
+          "accepted": 0
+        },
+        {
+          "id": "bashinform",
+          "name": "Башинформ",
+          "url": "https://www.bashinform.ru/",
+          "category": "media",
+          "coverage": "Башкортостан; проверяется по каждому материалу",
+          "access": "rss_discovery",
+          "authorization": false,
+          "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки",
+          "status": "ok",
+          "last_success_at": "2026-10-11T13:15:46.770776+00:00",
+          "error": null,
+          "collected": 27,
+          "accepted": 1,
+          "method": "Public homepage headings; dates from article URL, day precision; no archive coverage",
+          "verified_page_url": "https://www.bashinform.ru/",
+          "rss_status": "not_discovered"
+        },
+        {
+          "id": "rbc",
+          "name": "РБК",
+          "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "category": "media",
+          "coverage": "Россия; без регионального основания только контекст",
+          "access": "rss",
+          "authorization": false,
+          "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки",
+          "status": "ok",
+          "last_success_at": "2026-10-11T13:15:46.770776+00:00",
+          "error": null,
+          "collected": 30,
+          "accepted": 0,
+          "verified_feed_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "method": "RSS headings, at most 150 available entries; not an archive search"
+        },
+        {
+          "id": "eis",
+          "name": "ЕИС закупки",
+          "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+          "category": "procurement",
+          "coverage": "Россия; регион подтверждается текстом карточки",
+          "access": "public_html",
+          "authorization": false,
+          "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+          "status": "error",
+          "last_success_at": null,
+          "error": "HTTPError HTTP 503: collection failed; inspect adapter and limits",
+          "collected": 0,
+          "accepted": 0
+        }
+      ],
+      "summary": {
+        "categories": {
+          "marketing": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "advertising": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "ai": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "research": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          }
+        },
+        "direct_b2b_events": null,
+        "audience": {},
+        "geography": [
+          {
+            "city": "Уфа",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Стерлитамак",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Салават",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Нефтекамск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Октябрьский",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Белорецк",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Ишимбай",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Туймазы",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Кумертау",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Бирск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          }
+        ],
+        "unique_observations": 1,
+        "duplicates_removed": 0,
+        "verified_sources": 2,
+        "opportunities": [],
+        "swot": {
+          "object": "Выход поставщика услуг на рынок Башкортостана",
+          "strengths": null,
+          "weaknesses": null,
+          "opportunities": [],
+          "threats": [],
+          "limitation": "Сведения о конкретном поставщике отсутствуют; внешние угрозы не установлены"
+        },
+        "comparison": {
+          "comparable": false,
+          "new": 1,
+          "changed": 0,
+          "reason": "Дельта сохранённых наблюдений; тренд не рассчитывается: требуются завершённые сопоставимые окна и стабильное покрытие",
+          "requested_compare_days": 90
+        },
+        "limitations": [
+          "Обследованы только перечисленные источники, не весь рынок",
+          "Поисковая частотность не подключена; покупателей и денежный объём рынка не оцениваем",
+          "Бюджеты и цены не извлечены — нет данных; зарплаты вакансий не бюджеты услуг",
+          "LLM-интерпретация и перевод отключены; факты и подсчёты выполняются программно",
+          "Автоматический анализ требований, отраслей, отзывов и опросов не подключён",
+          "Период RSS ограничен доступной лентой, HH — последними 30 днями",
+          "Неполное покрытие: спрос неизвестен"
+        ]
+      }
+    },
+    {
+      "run": {
+        "id": "733f85ea-eb6b-44e7-bcca-b94243bf9a1b",
+        "started_at": "2026-10-11T13:22:01.376917+00:00",
+        "config": {
+          "region": "Республика Башкортостан",
+          "cities": [
+            "Уфа",
+            "Стерлитамак",
+            "Салават",
+            "Нефтекамск",
+            "Октябрьский",
+            "Белорецк",
+            "Ишимбай",
+            "Туймазы",
+            "Кумертау",
+            "Бирск"
+          ],
+          "days": 90,
+          "compare_days": 90,
+          "services": [
+            "marketing",
+            "advertising",
+            "ai",
+            "research"
+          ],
+          "groups": [
+            "vacancies",
+            "media",
+            "procurement"
+          ],
+          "max_requests": 30,
+          "max_pages": 10,
+          "max_seconds": 180,
+          "max_api_budget": 0,
+          "llm": {
+            "enabled": false,
+            "provider": null,
+            "model": null
+          },
+          "sources": [
+            {
+              "id": "hh",
+              "name": "HeadHunter",
+              "url": "https://api.hh.ru",
+              "category": "vacancies",
+              "coverage": "регион из актуального справочника /areas",
+              "access": "official_api",
+              "authorization": false,
+              "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL"
+            },
+            {
+              "id": "bashinform",
+              "name": "Башинформ",
+              "url": "https://www.bashinform.ru/",
+              "category": "media",
+              "coverage": "Башкортостан; проверяется по каждому материалу",
+              "access": "rss_discovery",
+              "authorization": false,
+              "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки"
+            },
+            {
+              "id": "rbc",
+              "name": "РБК",
+              "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+              "category": "media",
+              "coverage": "Россия; без регионального основания только контекст",
+              "access": "rss",
+              "authorization": false,
+              "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки"
+            },
+            {
+              "id": "eis",
+              "name": "ЕИС закупки",
+              "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+              "category": "procurement",
+              "coverage": "Россия; регион подтверждается текстом карточки",
+              "access": "public_html",
+              "authorization": false,
+              "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса"
+            }
+          ]
+        },
+        "period_start": "2026-07-13T13:22:01.376917+00:00",
+        "period_end": "2026-10-11T13:22:01.376917+00:00",
+        "status": "partial",
+        "llm_status": "disabled",
+        "api_spend": 0,
+        "currency": "RUB",
+        "finished_at": "2026-10-11T13:22:33.859405+00:00",
+        "requests": 5,
+        "pages": 2
+      },
+      "coverage": [
+        {
+          "id": "hh",
+          "name": "HeadHunter",
+          "url": "https://api.hh.ru",
+          "category": "vacancies",
+          "coverage": "регион из актуального справочника /areas",
+          "access": "official_api",
+          "authorization": false,
+          "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+          "status": "blocked",
+          "last_success_at": null,
+          "error": "HTTPError HTTP 403: доступ к поиску/API отклонён (HTTP 403)",
+          "collected": 0,
+          "accepted": 0
+        },
+        {
+          "id": "bashinform",
+          "name": "Башинформ",
+          "url": "https://www.bashinform.ru/",
+          "category": "media",
+          "coverage": "Башкортостан; проверяется по каждому материалу",
+          "access": "rss_discovery",
+          "authorization": false,
+          "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки",
+          "status": "ok",
+          "last_success_at": "2026-10-11T13:22:01.376917+00:00",
+          "error": null,
+          "collected": 27,
+          "accepted": 1,
+          "method": "Заголовки открытой главной; даты из URL с точностью до дня; архив не обследован",
+          "verified_page_url": "https://www.bashinform.ru/",
+          "rss_status": "not_discovered"
+        },
+        {
+          "id": "rbc",
+          "name": "РБК",
+          "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "category": "media",
+          "coverage": "Россия; без регионального основания только контекст",
+          "access": "rss",
+          "authorization": false,
+          "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки",
+          "status": "ok",
+          "last_success_at": "2026-10-11T13:22:01.376917+00:00",
+          "error": null,
+          "collected": 30,
+          "accepted": 0,
+          "verified_feed_url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+          "method": "RSS: не более 150 текущих элементов; архив не обследован"
+        },
+        {
+          "id": "eis",
+          "name": "ЕИС закупки",
+          "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+          "category": "procurement",
+          "coverage": "Россия; регион подтверждается текстом карточки",
+          "access": "public_html",
+          "authorization": false,
+          "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+          "status": "error",
+          "last_success_at": null,
+          "error": "HTTPError HTTP 503: сбор не выполнен; проверьте доступ, формат и лимиты",
+          "collected": 0,
+          "accepted": 0
+        }
+      ],
+      "summary": {
+        "categories": {
+          "marketing": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "advertising": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "ai": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          },
+          "research": {
+            "signals": {},
+            "evidence_ids": [],
+            "direct_b2b_events": null,
+            "unit": "уникальные наблюдения в обследованных источниках, не покупатели",
+            "calculation": "Дедупликация canonical URL/hash; регион + дата + категория + тип сигнала; сегменты раздельно"
+          }
+        },
+        "direct_b2b_events": null,
+        "audience": {},
+        "geography": [
+          {
+            "city": "Уфа",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Стерлитамак",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Салават",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Нефтекамск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Октябрьский",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Белорецк",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Ишимбай",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Туймазы",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Кумертау",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          },
+          {
+            "city": "Бирск",
+            "observations": null,
+            "unit": "уникальные наблюдения",
+            "limitation": "Нет данных не означает отсутствие спроса"
+          }
+        ],
+        "unique_observations": 1,
+        "duplicates_removed": 0,
+        "verified_sources": 2,
+        "opportunities": [],
+        "swot": {
+          "object": "Выход поставщика услуг на рынок Башкортостана",
+          "strengths": null,
+          "weaknesses": null,
+          "opportunities": [],
+          "threats": [],
+          "limitation": "Сведения о конкретном поставщике отсутствуют; внешние угрозы не установлены"
+        },
+        "comparison": {
+          "comparable": false,
+          "new": 0,
+          "changed": 0,
+          "reason": "Дельта сохранённых наблюдений; тренд не рассчитывается: требуются завершённые сопоставимые окна и стабильное покрытие",
+          "requested_compare_days": 90
+        },
+        "limitations": [
+          "Обследованы только перечисленные источники, не весь рынок",
+          "Поисковая частотность не подключена; покупателей и денежный объём рынка не оцениваем",
+          "Бюджеты и цены не извлечены — нет данных; зарплаты вакансий не бюджеты услуг",
+          "LLM-интерпретация и перевод отключены; факты и подсчёты выполняются программно",
+          "Автоматический анализ требований, отраслей, отзывов и опросов не подключён",
+          "Период RSS ограничен доступной лентой, HH — последними 30 днями",
+          "Неполное покрытие: спрос неизвестен"
+        ]
+      }
+    }
+  ]
+}
