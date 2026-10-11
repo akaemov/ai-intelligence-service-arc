@@ -10,8 +10,13 @@ on:
         description: Максимум открытых страниц (1–60)
         default: '60'
         type: string
+      artifact_run_id:
+        description: Повторно прочитать ранее собранный набор (без запросов к сайту)
+        default: ''
+        type: string
 permissions:
   contents: read
+  actions: read
 jobs:
   collect:
     runs-on: ubuntu-latest
@@ -21,7 +26,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact_run_id != ''
+        with:
+          name: company-facts
+          path: .state
+          run-id: ${{ inputs.artifact_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Собрать разрешённые сведения, без исходных страниц и личных контактов
+        if: inputs.artifact_run_id == ''
         env:
           COMPANY_URL: ${{ inputs.url }}
           MAX_PAGES: ${{ inputs.max_pages }}
