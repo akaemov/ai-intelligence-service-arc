@@ -59,7 +59,7 @@ def normalize(raw,source,run_id,config,now):
     selected=not config.get('regions') or customer_region in config['regions']
     selected=selected and (not config.get('cities') or customer_city in config['cities'])
     sector=not config.get('industries') or raw.get('industry') in config['industries']
-    scope_ok=(config.get('mode','russia')=='russia' or selected) and sector
+    scope_ok=selected and sector
     eligible=country=='Россия' and bool(geo) and category in config['services'] and in_period and language=='ru' and scope_ok
     if config.get('regions') and not selected:limitations.append('Не относится к выбранной географии')
     if not sector:limitations.append('Отрасль не подтверждена или вне выбранного фильтра')
@@ -75,8 +75,8 @@ def normalize(raw,source,run_id,config,now):
       geography_evidence=redact(geo) if geo else None,organization_name=raw.get('organization_name'),
       customer_segment=raw.get('customer_segment'),industry=raw.get('industry'),service_category=category,signal_type=signal,
       customer_problem=problem,requested_service=redact(title)[:280] if signal=='A' else None,
-      explicit_budget=float(budget) if budget is not None else None,currency=raw.get('currency') if budget is not None else None,
-      budget_basis=redact(raw['budget_basis']) if budget is not None else None,price_type=raw.get('price_type') if budget is not None else None,
+      explicit_budget=float(budget) if budget is not None else None,currency=raw.get('currency') if budget is not None or raw.get('budget_min') is not None else None,
+      budget_basis=redact(raw['budget_basis']) if raw.get('budget_basis') else None,price_type=raw.get('price_type') if raw.get('budget_basis') else None,
       procurement_status=status,short_evidence_excerpt=excerpt,factual_summary=excerpt,analyst_interpretation=None,
       confidence_level='medium' if eligible else 'low',confidence_reason='Проверяемые поля источника; сила сигнала отделена от надёжности источника',
       content_hash=digest(title+' '+excerpt),duplicate_group_id=None,limitations=limitations,signal_subtype=subtype,
@@ -85,7 +85,7 @@ def normalize(raw,source,run_id,config,now):
       target_market_geography=raw.get('target_market_geography'),contractor_search_geography=raw.get('contractor_search_geography'),
       remote_delivery=raw.get('remote_delivery'),organization_size=raw.get('organization_size'),geography_details=raw.get('geography_details'),
       federal_eligible=bool(eligible),event_id=raw.get('event_id'),requirements=redact(raw['requirements'])[:280] if raw.get('requirements') else None,
-      dictionary_version=DICTIONARY['version'])
+      dictionary_version=DICTIONARY['version'],budget_min=raw.get('budget_min'),budget_max=raw.get('budget_max'))
     return item.validate()
 
 def deduplicate(items):

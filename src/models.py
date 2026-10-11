@@ -62,6 +62,8 @@ class Observation:
     event_id: str | None = None
     requirements: str | None = None
     dictionary_version: str | None = None
+    budget_min: float | None = None
+    budget_max: float | None = None
     def validate(self):
         for name, hint in get_type_hints(type(self)).items():
             value=getattr(self,name)
@@ -74,6 +76,9 @@ class Observation:
                 valid=isinstance(value,list) and all(isinstance(v,str) for v in value)
             else:valid=isinstance(value,hint)
             if not valid:raise ValueError('Invalid field type: '+name)
+        for amount in (self.budget_min,self.budget_max):
+            if amount is not None and (not math.isfinite(amount) or amount<0 or not self.budget_basis or not self.price_type):raise ValueError('Invalid budget range')
+        if self.budget_min is not None and self.budget_max is not None and self.budget_min>self.budget_max:raise ValueError('Reversed budget range')
         if self.explicit_budget is not None and not math.isfinite(self.explicit_budget):raise ValueError('Nonfinite budget')
         if self.signal_type not in 'ABCDEF'  or len(self.signal_type) != 1:
             raise ValueError('invalid signal')

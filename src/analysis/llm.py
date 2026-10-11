@@ -9,6 +9,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def apply_result(items,result):
     by_id={o.observation_id:o for o in items}
+    updates=[]
     for value in result.get('observations',[]):
         if not isinstance(value,dict):raise ValueError('Invalid LLM response')
         item=by_id.get(value.get('observation_id'))
@@ -16,6 +17,8 @@ def apply_result(items,result):
         if not item or not isinstance(quote,str) or not quote or quote not in item.short_evidence_excerpt:raise ValueError('Unsupported LLM evidence')
         if not isinstance(text,str) or len(text)>500 or signal not in list('ABCDE'):raise ValueError('Invalid LLM interpretation')
         privacy_check(value)
+        updates.append((item,signal,text))
+    for item,signal,text in updates:
         item.analyst_interpretation=f'Гипотеза LLM (не факт), предложенный тип {signal}: '+text
         item.limitations.append('LLM-предположение требует ручной проверки; исходный тип сигнала не изменён')
 

@@ -35,7 +35,7 @@ class Links(HTMLParser):
         if tag=='a' and self.current:
             self.links.append((self.current,' '.join(self.text).strip())); self.current=None
 
-def rss(client,source):
+def rss(client,source,config=None):
     url=source['url']; client.allowed(url)
     body=client.get(url,page=True)
     if source['access']=='rss_discovery':
@@ -48,6 +48,7 @@ def rss(client,source):
                 if match and title:
                     records.append({'title':title[:280],'url':urljoin(url,href),'published_at':iso(match[1]),'date_basis':'дата в URL издателя (точность до дня)'})
             if not records:raise ValueError('Neither RSS nor dated article links discovered')
+            if config:enrich_context(client,records,config)
             return records[:150],{'method':'Заголовки открытой главной; даты из URL с точностью до дня; архив не обследован','verified_page_url':url,'rss_status':'not_discovered'}
         url=urljoin(url,p.feeds[0]); client.allowed(url); body=client.get(url,page=True)
     # Feed XML is untrusted data; external entities are never resolved by ElementTree.
@@ -70,6 +71,28 @@ def rss(client,source):
         if re.search(r'росси[яию]|российск',r['title'],re.I):
             r.update(country='Россия',geography_evidence='Россия явно упомянута в заголовке; только контекст, регион заказчика не установлен')
     return records, {'verified_feed_url':url,'method':'RSS: не более 150 текущих элементов; архив не обследован'}
+
+def enrich_context(client,records,config):
+    """Inspect permitted topical articles for explicit event locations, never customer inference."""
+    from src.collectors.dom import DOM
+    from src.processing.pipeline import LEXICON
+    directory=config.get('_directory')
+    if not directory:return
+    for record in records:
+        if not any(term in record['title'].lower() for service in config['services'] for term in LEXICON[service]):continue
+        if client.source_pages>=config['per_source_pages']:break
+        try:
+            client.allowed(record['url'])
+            tree=DOM(client.get(record['url'],page=True).decode('utf-8','replace')).root
+            for node in tree.nodes('p'):
+                text=' '.join(node.text().split())
+                # Event location is context, never the location of a service buyer.
+                match=re.search(r'Мероприятие пройдет[^.]{0,120} в Москве[^.]{0,60}\.',text)
+                if match and directory.resolve('Москва'):
+                    record.update(country='Россия',execution_geography='Москва',geography_evidence=match[0],
+                        geography_details={'execution_location':match[0]},evidence_text=record['title']+' — '+match[0])
+                    break
+        except Exception:continue
 
 def find_area(nodes,name):
     for node in nodes:
@@ -165,4 +188,4 @@ def collect(client,source,config):
         return {'workspace':workspace,'weblancer':weblancer}[source['id']](client,source,config)
     adapter=ADAPTERS.get(source['id'])
     if not adapter:raise ValueError('Adapter not implemented')
-    return adapter(client,source) if source['category']=='media' else adapter(client,source,config)
+    return adapter(client,source,config)

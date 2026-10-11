@@ -109,6 +109,7 @@ def execute(config,state,output,resume=None):
         if config.get('llm',{}).get('enabled'):
             from src.analysis.llm import enrich
             run['llm_status'],run['api_spend']=enrich(unique,config,client)
+            run['requests']=client.requests
         db=sqlite3.connect(state/'research.sqlite')
         db.execute('CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, payload TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS observations (run_id TEXT, id TEXT, payload TEXT, PRIMARY KEY(run_id,id))')

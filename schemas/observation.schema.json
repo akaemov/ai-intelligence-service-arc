@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Observation",
+  "title": "Observation v2",
   "type": "object",
   "properties": {
     "observation_id": {
@@ -25,63 +25,100 @@
       "type": "string"
     },
     "published_at": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "collected_at": {
       "type": "string"
     },
     "original_language": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "region": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "city_or_district": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "geography_evidence": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "organization_name": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "customer_segment": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "industry": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "service_category": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "signal_type": {
+      "type": "string",
       "enum": [
         "A",
         "B",
@@ -92,67 +129,94 @@
       ]
     },
     "customer_problem": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "requested_service": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "explicit_budget": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "minimum": 0
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "currency": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "budget_basis": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "price_type": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "procurement_status": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "short_evidence_excerpt": {
-      "type": "string",
-      "maxLength": 280
+      "type": "string"
     },
     "factual_summary": {
       "type": "string"
     },
     "analyst_interpretation": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "confidence_level": {
-      "enum": [
-        "low",
-        "medium",
-        "high"
-      ]
+      "type": "string"
     },
     "confidence_reason": {
       "type": "string"
@@ -161,9 +225,13 @@
       "type": "string"
     },
     "duplicate_group_id": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "limitations": {
@@ -173,70 +241,182 @@
       }
     },
     "signal_subtype": {
-      "type": [
-        "string",
-        "null"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "survey": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "properties": {
-        "organizer": {
-          "type": [
-            "string",
-            "null"
-          ]
+      "anyOf": [
+        {
+          "type": "object"
         },
-        "dates": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "sample_composition": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "geography": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "question": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "method": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "limitations": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "sample_size": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "minimum": 1
+        {
+          "type": "null"
         }
-      }
+      ]
     },
     "regional_eligible": {
       "type": "boolean"
+    },
+    "country": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "federal_district": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "customer_region": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "customer_city": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "execution_geography": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "target_market_geography": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "contractor_search_geography": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "remote_delivery": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "organization_size": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "geography_details": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "federal_eligible": {
+      "type": "boolean"
+    },
+    "event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requirements": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dictionary_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "budget_min": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "budget_max": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [
@@ -275,7 +455,23 @@
     "limitations",
     "signal_subtype",
     "survey",
-    "regional_eligible"
+    "regional_eligible",
+    "country",
+    "federal_district",
+    "customer_region",
+    "customer_city",
+    "execution_geography",
+    "target_market_geography",
+    "contractor_search_geography",
+    "remote_delivery",
+    "organization_size",
+    "geography_details",
+    "federal_eligible",
+    "event_id",
+    "requirements",
+    "dictionary_version",
+    "budget_min",
+    "budget_max"
   ],
   "additionalProperties": false
 }

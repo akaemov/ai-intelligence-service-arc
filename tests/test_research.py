@@ -14,7 +14,7 @@ from src.processing.verifier import verify
 from src.publishing.export import privacy_check,publish,to_csv
 from src.run import execute,validate_config,ROOT
 from src.processing.geography import Directory,build_directory
-from src.collectors.requests import records_from_html,TENDER
+from src.collectors.requests import records_from_html,TENDER,JOB,workspace
 from src.analysis.llm import apply_result
 
 NOW=datetime.now(timezone.utc)
@@ -78,6 +78,30 @@ class ResearchTests(unittest.TestCase):
         html='<div><a href="/tenders/reklama-123/">Нужен подрядчик по рекламе</a><p>Мы работаем по всей России</p></div>'
         rows=records_from_html(html,'https://workspace.ru/',{'id':'workspace'},CONFIG,TENDER)
         self.assertEqual(len(rows),1);self.assertIsNone(rows[0]['country']);self.assertTrue(rows[0]['request_verified'])
+    def test_url_with_poisk_is_not_a_secret(self):
+        privacy_check({'url':'https://example.org/poisk-ispolnitelya-dlya-reklamy/'})
+        with self.assertRaises(ValueError):privacy_check({'token':'sk-'+'a'*24})
+    def test_budget_range_is_not_midpoint(self):
+        o=item(budget_min=300000.0,budget_max=900000.0,budget_basis='300 000 — 900 000',currency='RUB',price_type='customer_budget')
+        self.assertIsNone(o.explicit_budget);self.assertEqual(o.budget_min,300000.0);self.assertEqual(o.budget_max,900000.0)
+    def test_workspace_budget_excludes_view_count(self):
+        html='<a href="/tenders/kontent-marketing-123/"><span class="c-link__underlined">Нужен контент-маркетинг</span><span><button>300 000 — 900 000<span class="rub"></span></button><span>49</span></span></a>'
+        class PublicClient:
+            def allowed(self,url):return True
+            def get(self,url,**kwargs):return html.encode()
+        rows,_=workspace(PublicClient(),{'id':'workspace','url':'https://workspace.ru/'},CONFIG)
+        self.assertEqual(rows[0]['budget_min'],300000.0)
+        self.assertEqual(rows[0]['budget_max'],900000.0)
+        self.assertIsNone(rows[0]['explicit_budget'])
+    def test_listing_date_isolated_from_other_jobs(self):
+        html='<div><article><a href="/freelance/reklama-1/task-123/">Нужен подрядчик по рекламе</a><div class="whitespace-nowrap"><span>10.10.2026</span></div></article><article><a href="/freelance/reklama-1/task-124/">Другая реклама заказчика</a><div class="whitespace-nowrap"><span>09.10.2026</span></div></article></div>'
+        rows=records_from_html(html,'https://www.weblancer.net/',{'id':'weblancer'},CONFIG,JOB)
+        self.assertEqual(rows[0]['published_at'][:10],'2026-10-10')
+        self.assertEqual(rows[1]['published_at'][:10],'2026-10-09')
+    def test_llm_invalid_batch_does_not_partially_change_facts(self):
+        o=item()
+        with self.assertRaises(ValueError):apply_result([o],{'observations':[{'observation_id':o.observation_id,'supporting_quote':o.short_evidence_excerpt,'interpretation':'Проверить запрос','proposed_signal':'A'},{'observation_id':'missing'}]})
+        self.assertIsNone(o.analyst_interpretation)
     def test_offer_not_direct(self):self.assertEqual(item('Предлагаем рекламу, закажите у нас').signal_type,'D')
     def test_vacancy_not_contractor(self):
         o=normalize({'title':'Ищем маркетолога','url':'https://hh.ru/vacancy/123','published_at':NOW.isoformat()}, {'name':'HH','category':'vacancies'},'test',CONFIG,NOW)
@@ -94,7 +118,7 @@ class ResearchTests(unittest.TestCase):
     def test_search_interest_not_buyers(self):
         o=item();o.signal_type='B';o.requested_service=None
         summary=analyze([o],CONFIG,[{'status':'ok','category':'procurement','id':'eis'}],0)
-        self.assertEqual(summary['direct_b2b_events'],0);self.assertNotIn('buyers',summary);self.assertEqual(summary['categories']['advertising']['signals']['B'],1)
+        self.assertIsNone(summary['direct_b2b_events']);self.assertNotIn('buyers',summary);self.assertEqual(summary['categories']['advertising']['signals']['B'],1)
     def test_unavailable_source_is_not_zero_demand(self):
         summary=analyze([],CONFIG,[{'status':'blocked','category':'procurement','id':'eis'}],0)
         self.assertIsNone(summary['direct_b2b_events'])

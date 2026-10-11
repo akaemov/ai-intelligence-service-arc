@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, parse_qsl
 from src.models import PRIVATE
 
-TOKEN=re.compile(r'(?i)(?:gh[pousr]_[a-z0-9]{20,}|github_pat_[a-z0-9_]{20,}|sk-[a-z0-9_-]{16,}|(?:api[_-]?key|access[_-]?token|password|secret)\s*[=:]\s*[^\s,\"}]{6,})')
+TOKEN=re.compile(r'(?i)(?<![A-Za-z0-9])(?:gh[pousr]_[a-z0-9]{20,}|github_pat_[a-z0-9_]{20,}|sk-[a-z0-9_-]{16,}|(?:api[_-]?key|access[_-]?token|password|secret)\s*[=:]\s*[^\s,\"}]{6,})')
 def privacy_check(payload):
     def inspect(value):
         if isinstance(value,dict):

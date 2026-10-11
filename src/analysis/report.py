@@ -22,7 +22,7 @@ def analyze(items,config,coverage,duplicates,previous=None,directory=None):
         requests=[o for o in direct if o.service_category==service]
         b2b=[o for o in requests if o.customer_segment=='business']
         categories[service]={'signals':dict(Counter(o.signal_type for o in found)),
-          'evidence_ids':[o.observation_id for o in found],'direct_b2b_events':len(b2b) if demand_channel else None,
+          'evidence_ids':[o.observation_id for o in found],'direct_b2b_events':len(b2b) if b2b else None,
           'direct_by_segment':dict(Counter(o.customer_segment or 'unknown' for o in requests)),
           'unit':'уникальные наблюдения, не покупатели','calculation':'Тип + период + подтверждённая Россия; регион заказчика хранится отдельно; дедупликация event_id / URL / hash'}
         if b2b:
@@ -58,14 +58,14 @@ def analyze(items,config,coverage,duplicates,previous=None,directory=None):
             new_start=datetime.fromisoformat(config['_period_start'])
             comparable=old_end<=new_start and previous['run']['config']['days']==config['days']
         except (KeyError,ValueError):pass
-    return {'categories':categories,'direct_b2b_events':sum(o.customer_segment=='business' for o in direct) if demand_channel else None,
-      'direct_government_events':sum(o.customer_segment=='government' for o in direct) if demand_channel else None,
-      'direct_unknown_events':sum(o.customer_segment is None for o in direct) if demand_channel else None,
+    return {'categories':categories,'direct_b2b_events':sum(o.customer_segment=='business' for o in direct) or None,
+      'direct_government_events':sum(o.customer_segment=='government' for o in direct) or None,
+      'direct_unknown_events':sum(o.customer_segment is None for o in direct) or None,
       'audience':dict(Counter(o.customer_segment or 'unknown' for o in federal)),
       'industries':dict(Counter(o.industry or 'unknown' for o in federal)),
       'problems':[{'problem':p,'events':len(obs),'evidence_ids':[o.observation_id for o in obs],
         'limitation':'Слова в запросах, не измерение распространённости проблемы'} for p,obs in _problems(federal).items()],
-      'budgets':[{'observation_id':o.observation_id,'amount':o.explicit_budget,'currency':o.currency,'price_type':o.price_type,'basis':o.budget_basis} for o in federal if o.explicit_budget is not None and o.signal_type=='A'],
+      'budgets':[{'observation_id':o.observation_id,'amount':o.explicit_budget,'min':o.budget_min,'max':o.budget_max,'currency':o.currency,'price_type':o.price_type,'basis':o.budget_basis} for o in federal if (o.explicit_budget is not None or o.budget_min is not None) and o.signal_type=='A'],
       'geography':geography,'federal_without_region':sum(not o.customer_region for o in federal),
       'unknown_geography':sum(not o.federal_eligible for o in items),
       'interregional':[o.observation_id for o in direct if o.contractor_search_geography and o.contractor_search_geography!=o.customer_region],

@@ -27,12 +27,14 @@ jobs:
           for attempt in range(12):
               try:
                   html=fetch(base).decode('utf-8')
-                  assert 'Спрос' in html
+                  assert 'Спрос' in html and 'Россия' in html
                   resources=re.findall(r'(?:src|href)="([^"]+\.(?:js|css))"',html)
                   assert len(resources)>=2
                   for resource in resources:assert fetch(urljoin(base,resource))
                   report=json.loads(fetch(urljoin(base,'data/latest.json')))
-                  assert isinstance(report['observations'],list)
+                  assert report['schema_version']==2
+                  assert report['run']['config']['mode'] in ('russia','selected_regions','industries')
+                  assert isinstance(report['observations'],list) and len(report['observations'])>0
                   assert len(report['coverage'])>=4
                   assert report['run']['status'] in ('success','partial','failed')
                   print('PUBLIC_SITE_VERIFIED:',base)
