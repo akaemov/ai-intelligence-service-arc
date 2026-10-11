@@ -14,7 +14,7 @@ def notice(value):
     payload=json.dumps(value,ensure_ascii=False)
     pieces=[payload[i:i+1800] for i in range(0,len(payload),1800)]
     for index,piece in enumerate(pieces):
-        data=json.dumps({'url':value.get('url'),'part':index,'parts':len(pieces),'data':piece},ensure_ascii=False)
+        data=json.dumps({'record_key':str(value.get('url'))+'::'+str(value.get('status')),'url':value.get('url'),'part':index,'parts':len(pieces),'data':piece},ensure_ascii=False)
         print('::notice title=Company research::'+data.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
 def emit(value):RECORDS.append(value)
 def research(base,max_pages):
@@ -82,6 +82,7 @@ def research(base,max_pages):
             emit({'url':url,'status':'ok','title':[n.text()[:200] for n in tree.nodes('title')][:1],
                 'descriptions':list(dict.fromkeys(descriptions)),'headings':list(dict.fromkeys(headings))[:30],
                 'points':points[:18],'excerpt':redact(compact(main.text()))[:280],
+                'metrics':list(dict.fromkeys(redact(compact(n.text()))[:150] for n in main.nodes() if meaningful(n) and n.tag in ('div','span','p') and 8<len(compact(n.text()))<150 and re.search(r'\d[^.]{0,50}(?:лет|проект|объект|сотрудник|м²|м2|дней|регион|%|руб|₽)',n.text(),re.I)))[:20],
                 'specifications':[[redact(compact(c.text()))[:120] for c in row.nodes() if c.tag in ('td','th')] for row in main.nodes('tr')][:25],
                 'structure':{'main_tags':len(tree.nodes('main')),'h1_parents':[n.parent.attrs.get('class','') for n in tree.nodes('h1')][:2]},
                 'links':[l for l in links if urlsplit(l['url']).hostname not in hosts][:15],
