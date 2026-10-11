@@ -12,7 +12,7 @@ def compact(value):return ' '.join(value.split())
 RECORDS=[]
 def notice(value):
     payload=json.dumps(value,ensure_ascii=False)
-    pieces=[payload[i:i+1800] for i in range(0,len(payload),1800)]
+    pieces=[payload[i:i+3000] for i in range(0,len(payload),3000)]
     for index,piece in enumerate(pieces):
         data=json.dumps({'record_key':str(value.get('url'))+'::'+str(value.get('status')),'url':value.get('url'),'part':index,'parts':len(pieces),'data':piece},ensure_ascii=False)
         print('::notice title=Company research::'+data.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
