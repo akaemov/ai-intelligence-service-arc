@@ -1,6 +1,12 @@
 name: Проверка публичного сайта
 on:
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: Проверить публикацию конкретного UUID исследования
+        type: string
+        required: false
+        default: ""
   push:
     branches: [main]
     paths: [.github/workflows/check-pages.yml]
@@ -15,9 +21,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Проверить страницу, ресурсы и реальные данные через HTTPS
+        env:
+          EXPECTED_RUN_ID: ${{ inputs.run_id }}
         run: |
           python - <<'PY'
-          import json, re, time, urllib.request
+          import json, os, re, time, urllib.request
           from urllib.parse import urljoin
           base='https://akaemov.github.io/ai-intelligence-service-arc/'
           def fetch(url):
@@ -33,6 +41,7 @@ jobs:
                   for resource in resources:assert fetch(urljoin(base,resource))
                   report=json.loads(fetch(urljoin(base,'data/latest.json')))
                   assert report['schema_version']==2
+                  if os.environ.get('EXPECTED_RUN_ID'):assert report['run']['id']==os.environ['EXPECTED_RUN_ID']
                   assert report['run']['config']['mode'] in ('russia','selected_regions','industries')
                   assert isinstance(report['observations'],list) and len(report['observations'])>0
                   assert len(report['coverage'])>=4
