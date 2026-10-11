@@ -1,0 +1,46 @@
+name: Проверка публичного сайта
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/check-pages.yml]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Проверить страницу, ресурсы и реальные данные через HTTPS
+        run: |
+          python - <<'PY'
+          import json, re, time, urllib.request
+          from urllib.parse import urljoin
+          base='https://akaemov.github.io/ai-intelligence-service-arc/'
+          def fetch(url):
+              with urllib.request.urlopen(url,timeout=15) as response:
+                  if response.status!=200:raise RuntimeError('Unexpected HTTP status')
+                  return response.read()
+          for attempt in range(12):
+              try:
+                  html=fetch(base).decode('utf-8')
+                  assert 'Спрос' in html
+                  resources=re.findall(r'(?:src|href)="([^"]+\.(?:js|css))"',html)
+                  assert len(resources)>=2
+                  for resource in resources:assert fetch(urljoin(base,resource))
+                  report=json.loads(fetch(urljoin(base,'data/latest.json')))
+                  assert isinstance(report['observations'],list)
+                  assert len(report['coverage'])>=4
+                  assert report['run']['status'] in ('success','partial','failed')
+                  print('PUBLIC_SITE_VERIFIED:',base)
+                  print('REPORT:',report['run']['id'],report['run']['status'])
+                  print('VERIFIED_SOURCES:',report['summary']['verified_sources'])
+                  print('OBSERVATIONS:',len(report['observations']))
+                  break
+              except Exception:
+                  if attempt==11:raise
+                  time.sleep(10)
+          PY

@@ -4,11 +4,11 @@
 
 По запросу владельца собран и отправлен статический сайт в ветку `gh-pages` (коммит `0d53d699a4604cc1b762c4a5fad0c6f82ec0597b`). Включены проверенные обезличенные latest.json/attempt.json; внутренние SQLite, кэш и секреты исключены. Частичное покрытие явно показано, готовность исследования не заявляется.
 
-GitHub API отклонил изменение visibility и включение Pages с `403 Resource not accessible by integration`; репозиторий остался private. Владельцу нужно:
+Первоначально API интеграции отклонил изменение visibility и включение Pages с `403 Resource not accessible by integration`. Владелец включил публичный доступ и Pages вручную; GitHub API теперь подтверждает public=true, source=gh-pages/root и успешную сборку. Настройки для воспроизведения:
 
 1. Settings → General → Danger Zone → Change repository visibility → Public.
 2. Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: gh-pages → / (root) → Save.
-3. Дождаться успешного Pages build/deployment. Ожидаемый адрес после включения: https://akaemov.github.io/ai-intelligence-service-arc/ . До подтверждения деплоя это не действующая ссылка на сайт.
+3. Дождаться успешного Pages build/deployment. Адрес: https://akaemov.github.io/ai-intelligence-service-arc/ . Проверка публичного HTML, JS/CSS и latest.json выполняется workflow «Проверка публичного сайта».
 
 Эта ветка содержит снимок текущего отчёта; обновление сборщика само по себе её не обновляет. Для автоматизированной публикации следующего полноценного исследования переключите Pages Source на GitHub Actions и используйте workflow ниже. Частичный снимок опубликован в Git-ветку по отдельному явному запросу владельца; требования достаточного покрытия в research.yml сохранены.
 
