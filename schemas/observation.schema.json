@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observation",
+  "type": "object",
+  "properties": {
+    "observation_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "source_name": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "canonical_url": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "published_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "collected_at": {
+      "type": "string"
+    },
+    "original_language": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "region": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "city_or_district": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "geography_evidence": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "organization_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "customer_segment": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "industry": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "service_category": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "signal_type": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ]
+    },
+    "customer_problem": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requested_service": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "explicit_budget": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "currency": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "budget_basis": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "price_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "procurement_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "short_evidence_excerpt": {
+      "type": "string",
+      "maxLength": 280
+    },
+    "factual_summary": {
+      "type": "string"
+    },
+    "analyst_interpretation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "confidence_level": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "confidence_reason": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "duplicate_group_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "signal_subtype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "survey": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "organizer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dates": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sample_composition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "geography": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "limitations": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sample_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      }
+    },
+    "regional_eligible": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "observation_id",
+    "run_id",
+    "source_name",
+    "source_type",
+    "source_url",
+    "canonical_url",
+    "title",
+    "published_at",
+    "collected_at",
+    "original_language",
+    "region",
+    "city_or_district",
+    "geography_evidence",
+    "organization_name",
+    "customer_segment",
+    "industry",
+    "service_category",
+    "signal_type",
+    "customer_problem",
+    "requested_service",
+    "explicit_budget",
+    "currency",
+    "budget_basis",
+    "price_type",
+    "procurement_status",
+    "short_evidence_excerpt",
+    "factual_summary",
+    "analyst_interpretation",
+    "confidence_level",
+    "confidence_reason",
+    "content_hash",
+    "duplicate_group_id",
+    "limitations",
+    "signal_subtype",
+    "survey",
+    "regional_eligible"
+  ],
+  "additionalProperties": false
+}

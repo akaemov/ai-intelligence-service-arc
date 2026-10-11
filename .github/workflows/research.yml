@@ -1,0 +1,114 @@
+name: Исследование спроса
+on:
+  workflow_dispatch:
+    inputs:
+      parameters:
+        description: 'JSON: days, compare_days, cities, services, groups, max_requests, max_pages, max_seconds, max_api_budget, region'
+        required: false
+        default: '{}'
+        type: string
+      publish:
+        description: 'Опубликовать проверенную публичную выгрузку в GitHub Pages (нужно разрешение владельца)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: research-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - uses: actions/cache/restore@v4
+        with:
+          path: web/public/data
+          key: public-research-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: public-research-${{ github.ref_name }}-
+      - name: Проверить параметры
+        env:
+          PARAMETERS: ${{ inputs.parameters }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from src.run import validate_config
+          params=json.loads(os.environ['PARAMETERS'])
+          allowed={'days','compare_days','cities','services','groups','max_requests','max_pages','max_seconds','max_api_budget','region'}
+          if not isinstance(params,dict) or not set(params)<=allowed:
+              raise ValueError('Unknown parameters')
+          config=json.loads(Path('config/research.json').read_text())
+          config.update(params)
+          validate_config(config)
+          Path('.state').mkdir(exist_ok=True)
+          Path('.state/run-config.json').write_text(json.dumps(config,ensure_ascii=False))
+          PY
+      - run: python -m unittest discover -s tests -v
+      - name: Сбор и отчёт (частичное покрытие отражается явно)
+        run: |
+          code=0
+          python -m src.run --config .state/run-config.json || code=$?
+          if [ "$code" -ne 0 ] && [ "$code" -ne 2 ]; then exit "$code"; fi
+          if [ ! -f web/public/data/attempt.json ]; then exit 1; fi
+      - name: Проверка публичных данных и минимального покрытия
+        id: gate
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from src.publishing.export import privacy_check
+          for p in Path('web/public/data').glob('*.json'):
+              privacy_check(json.loads(p.read_text()))
+          p=json.loads(Path('web/public/data/attempt.json').read_text())
+          ok=[s for s in p['coverage'] if s['status']=='ok']
+          ready=len(ok)>=3 and len({s['category'] for s in ok})>=2 and any(s['category']=='procurement' for s in ok) and p['run']['status']!='failed'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('ready='+str(ready).lower()+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+              f.write('## Отчёт запуска\n\nСтатус: '+p['run']['status']+'; проверенных источников: '+str(len(ok))+'\n\n')
+              for s in p['coverage']:f.write('- '+s['name']+': '+s['status']+' '+str(s.get('error') or '')+'\n')
+              f.write('\nМинимальное покрытие для публикации: '+str(ready)+'\n')
+          PY
+      - run: npm ci --ignore-scripts && npm test && npm run build -- --base=/${{ github.event.repository.name }}/
+        working-directory: web
+      - uses: actions/cache/save@v4
+        with:
+          path: web/public/data
+          key: public-research-${{ github.ref_name }}-${{ github.run_id }}
+      - name: Обезличенный отчёт и сайт (не внутренняя БД)
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-research-report
+          path: |
+            web/public/data
+            web/dist
+          retention-days: 30
+      - uses: actions/upload-pages-artifact@v3
+        if: inputs.publish && steps.gate.outputs.ready == 'true'
+        with:
+          path: web/dist
+  deploy:
+    if: inputs.publish && needs.research.outputs.ready == 'true'
+    needs: research
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish approved public results
+        id: deployment
+        uses: actions/deploy-pages@v4

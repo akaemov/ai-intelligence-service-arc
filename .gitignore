@@ -1,0 +1,11 @@
+.state/
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+web/dist/
+web/public/data/
+.env
+.env.*
+!.env.example
+*.log

@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+import {readFileSync} from 'node:fs';
+const code=ts.transpileModule(readFileSync(new URL('../src/utils.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {filterObservations,safeUrl,csvExport}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const rows=[{title:'Нужен маркетолог',short_evidence_excerpt:'Вакансия',source_name:'HH',signal_type:'C',service_category:'marketing',city_or_district:'Уфа',customer_segment:'business'},{title:'Предлагаем рекламу',short_evidence_excerpt:'Предложение',source_name:'Компания',signal_type:'D',service_category:'advertising',city_or_district:'Салават',customer_segment:null}];
+const empty={query:'',signal:'',service:'',city:'',segment:''};
+test('filters combine geography, signal, segment and text',()=>{assert.equal(filterObservations(rows,{...empty,query:'МАРКЕТОЛОГ',signal:'C',city:'Уфа',segment:'business'}).length,1);assert.equal(filterObservations(rows,{...empty,signal:'A'}).length,0);assert.equal(filterObservations(rows,{...empty,segment:'unknown'}).length,1)});
+test('links reject script and embedded credentials',()=>{assert.equal(safeUrl('javascript:alert(1)'),'#');assert.equal(safeUrl('https://user:pass@example.org'),'#');assert.equal(safeUrl('https://example.org/x'),'https://example.org/x')});
+test('CSV prevents spreadsheet formula execution',()=>assert.ok(csvExport([{title:'=HYPERLINK("bad")'}]).includes("'=HYPERLINK")));
