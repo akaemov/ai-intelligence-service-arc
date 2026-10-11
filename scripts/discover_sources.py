@@ -38,7 +38,7 @@ def inspect(base):
   status,text=get(base);p=Parser();p.feed(text);report['http']=status
   tree=DOM(text).root
   relevant=[a for a in tree.nodes('a') if re.search(r'/tenders/[^/]+-\d+/?$|/freelance/[^/]+/[^/]+-\d+/?$',a.attrs.get('href',''))]
-  report['request_links']=[{'url':urljoin(base,a.attrs['href']),'title':a.text()[:180],'parent_class':a.parent.attrs.get('class','')} for a in relevant[:12]]
+  report['request_links']=[{'url':urljoin(base,a.attrs['href']),'title':a.text()[:180],'parent_class':a.parent.attrs.get('class','')} for a in relevant[:3]]
   if relevant:
    detail=urljoin(base,relevant[0].attrs['href']);report['detail_allowed']=rp.can_fetch(AGENT,detail)
    if report['detail_allowed']:
@@ -47,9 +47,9 @@ def inspect(base):
       'time_fields':[n.attrs for n in d.nodes('time')],
       'metadata':{n.attrs.get('property') or n.attrs.get('name'):n.attrs.get('content') for n in d.nodes('meta') if any(x in (n.attrs.get('property','')+n.attrs.get('name','')).lower() for x in ['published','modified','date'])},
       'classes':sorted(Parser().classes.items())}
-    dp=Parser();dp.feed(dt);report['detail']['classes']=sorted(dp.classes.items(),key=lambda x:-x[1])[:45]
+    dp=Parser();dp.feed(dt);report['detail']['classes']=sorted(dp.classes.items(),key=lambda x:-x[1])[:10]
     text_only=' '.join(d.text().split())
-    report['detail']['field_snippets']=[text_only[max(0,m.start()-20):m.end()+100] for m in re.finditer(r'Бюджет|Опубликован|Дата публикации|Заказчик|Местоположение|Место выполнения|Город|Россия|Росси[ияю]|Создан',text_only)][:15]
+    report['detail']['field_snippets']=[text_only[max(0,m.start()-20):m.end()+100] for m in re.finditer(r'Бюджет|Опубликован|Дата публикации|Местоположение|Место выполнения|Город|Россия|Росси[ияю]|Создан',text_only)][:5]
 
   candidates=[]
   for href,title in p.links:
@@ -71,4 +71,5 @@ def inspect(base):
 for base in ['https://workspace.ru/','https://www.weblancer.net/']:
  result=json.dumps(inspect(base),ensure_ascii=False)
  print(result,flush=True)
- print('::notice title=Source discovery::'+result.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
+ small={k:inspect_value for k,inspect_value in json.loads(result).items() if k in ('url','http','home_allowed','error','request_links','detail_allowed','detail')}
+ print('::notice title=Source discovery::'+json.dumps(small,ensure_ascii=False).replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
