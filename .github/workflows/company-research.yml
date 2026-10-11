@@ -1,0 +1,28 @@
+name: Исследование открытого сайта компании
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: HTTPS-адрес открытого сайта компании
+        required: true
+        type: string
+      max_pages:
+        description: Максимум открытых страниц (1–30)
+        default: '20'
+        type: string
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Собрать разрешённые сведения, без исходных страниц и личных контактов
+        env:
+          COMPANY_URL: ${{ inputs.url }}
+          MAX_PAGES: ${{ inputs.max_pages }}
+        run: python -u scripts/research_company.py --url "$COMPANY_URL" --max-pages "$MAX_PAGES"
