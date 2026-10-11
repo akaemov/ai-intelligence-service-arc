@@ -18,8 +18,6 @@
   ],
   "groups": [
     "requests",
-    "procurement",
-    "vacancies",
     "media"
   ],
   "max_requests": 80,
@@ -66,19 +64,6 @@
       "sector_coverage": "Задания по словарю маркетинга, рекламы, ИИ, исследований"
     },
     {
-      "id": "hh",
-      "name": "HeadHunter",
-      "url": "https://api.hh.ru",
-      "category": "vacancies",
-      "coverage": "Россия; территориальные ID из /areas, не взаимозаменяемы с другими системами",
-      "access": "official_api",
-      "authorization": false,
-      "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
-      "operator": "hh",
-      "scope": "federal",
-      "sector_coverage": "Указанные направления; фильтр по словарю"
-    },
-    {
       "id": "bashinform",
       "name": "Башинформ",
       "url": "https://www.bashinform.ru/",
@@ -105,17 +90,17 @@
       "sector_coverage": "Указанные направления; фильтр по словарю"
     },
     {
-      "id": "eis",
-      "name": "ЕИС закупки",
-      "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
-      "category": "procurement",
-      "coverage": "Россия; регион подтверждается текстом карточки",
-      "access": "public_html",
-      "authorization": false,
-      "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
-      "operator": "eis",
+      "id": "cnews",
+      "name": "CNews — ИТ-бизнес",
+      "url": "https://www.cnews.ru/inc/rss/biz.xml",
+      "category": "media",
+      "operator": "cnews",
       "scope": "federal",
-      "sector_coverage": "Указанные направления; фильтр по словарю"
+      "coverage": "ИТ-бизнес; связь с Россией проверяется отдельно по заголовку",
+      "access": "rss",
+      "authorization": false,
+      "restrictions": "Официальный RSS найден на главной; robots.txt разрешает чтение; только заголовок, дата и ссылка, не полный материал",
+      "sector_coverage": "ИИ, автоматизация, маркетинг и коммерческие исследования; контекст, не заказы"
     }
   ]
 }

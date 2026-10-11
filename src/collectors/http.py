@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urljoin
 
 AGENT='RussiaDemandResearch/0.2 (+https://github.com/akaemov/ai-intelligence-service-arc)'
-ALLOWED={'api.hh.ru','www.bashinform.ru','bashinform.ru','rssexport.rbc.ru','zakupki.gov.ru','workspace.ru','www.b2b-center.ru','www.fl.ru','www.weblancer.net','trudvsem.ru','opendata.trudvsem.ru','api.openai.com'}
+ALLOWED={'www.cnews.ru','api.hh.ru','www.bashinform.ru','bashinform.ru','rssexport.rbc.ru','zakupki.gov.ru','workspace.ru','www.b2b-center.ru','www.fl.ru','www.weblancer.net','trudvsem.ru','opendata.trudvsem.ru','api.openai.com'}
 class LimitedRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         if req.has_header('Authorization') and urlsplit(newurl).hostname!=urlsplit(req.full_url).hostname:raise ValueError('Authenticated cross-host redirect denied')

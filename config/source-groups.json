@@ -67,12 +67,14 @@
   {
     "id": "procurement",
     "name": "Закупки",
-    "status": "implemented"
+    "status": "not_connected",
+    "reason": "Недоступный канал исключён из активного сбора"
   },
   {
     "id": "vacancies",
     "name": "Вакансии",
-    "status": "implemented"
+    "status": "not_connected",
+    "reason": "Недоступный канал исключён из активного сбора"
   },
   {
     "id": "aggregators",

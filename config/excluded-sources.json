@@ -1,0 +1,34 @@
+[
+  {
+    "id": "hh",
+    "name": "HeadHunter",
+    "url": "https://api.hh.ru",
+    "category": "vacancies",
+    "coverage": "Россия; территориальные ID из /areas, не взаимозаменяемы с другими системами",
+    "access": "official_api",
+    "authorization": false,
+    "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+    "operator": "hh",
+    "scope": "federal",
+    "sector_coverage": "Указанные направления; фильтр по словарю",
+    "status": "excluded",
+    "reason": "Поиск HH HTTP 403",
+    "last_verified_date": "2026-10-11"
+  },
+  {
+    "id": "eis",
+    "name": "ЕИС закупки",
+    "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+    "category": "procurement",
+    "coverage": "Россия; регион подтверждается текстом карточки",
+    "access": "public_html",
+    "authorization": false,
+    "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+    "operator": "eis",
+    "scope": "federal",
+    "sector_coverage": "Указанные направления; фильтр по словарю",
+    "status": "excluded",
+    "reason": "ЕИС HTTP 503",
+    "last_verified_date": "2026-10-11"
+  }
+]

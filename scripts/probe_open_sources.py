@@ -24,7 +24,7 @@ def probe(base):
         tree=DOM(get(base)).root
         feeds=[urljoin(base,n.attrs['href']) for n in tree.nodes('link') if 'rss' in n.attrs.get('type','') and n.attrs.get('href')]
         feeds+=[urljoin(base,n.attrs['href']) for n in tree.nodes('a') if 'rss' in n.attrs.get('href','').lower()]
-        result['title']=[n.text()[:100] for n in tree.nodes('title')]
+        result['title']=[n.text()[:100] for n in tree.nodes('title')][:1]
         result['feeds']=[]
         for url in list(dict.fromkeys(feeds))[:3]:
             if urlsplit(url).hostname!=urlsplit(base).hostname:continue

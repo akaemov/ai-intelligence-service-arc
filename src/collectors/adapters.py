@@ -180,7 +180,7 @@ def eis(client,source,config):
              'customer_segment':'government' if '44-ФЗ' in text else None})
     return records,{'method':'Первая страница на направление; география и статус только из явных полей карточки','limitation':'Разметка закупок требует проверки на успешном реальном ответе'}
 
-ADAPTERS={'hh':hh,'bashinform':rss,'rbc':rss,'eis':eis}
+ADAPTERS={'cnews':rss,'hh':hh,'bashinform':rss,'rbc':rss,'eis':eis}
 
 def collect(client,source,config):
     if source['id'] in ('workspace','weblancer'):

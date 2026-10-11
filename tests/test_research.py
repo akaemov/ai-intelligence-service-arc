@@ -102,6 +102,17 @@ class ResearchTests(unittest.TestCase):
         o=item()
         with self.assertRaises(ValueError):apply_result([o],{'observations':[{'observation_id':o.observation_id,'supporting_quote':o.short_evidence_excerpt,'interpretation':'Проверить запрос','proposed_signal':'A'},{'observation_id':'missing'}]})
         self.assertIsNone(o.analyst_interpretation)
+    def test_defaults_enable_only_verified_open_channels(self):
+        self.assertNotIn('hh',{s['id'] for s in CONFIG['sources']})
+        self.assertNotIn('eis',{s['id'] for s in CONFIG['sources']})
+        self.assertEqual(set(CONFIG['groups']),{'requests','media'})
+        self.assertIn('cnews',{s['id'] for s in CONFIG['sources']})
+    def test_rss_preserves_context_and_russia_requires_explicit_evidence(self):
+        import src.collectors.adapters as adapters
+        self.assertIs(adapters.ADAPTERS['cnews'],rss)
+        a=normalize({'title':'Российский бизнес внедряет искусственный интеллект','url':'https://www.cnews.ru/news/a','published_at':NOW.isoformat(),'country':'Россия','geography_evidence':'Российский бизнес в заголовке'}, {'name':'CNews','category':'media'},'test',CONFIG,NOW)
+        self.assertEqual(a.signal_type,'E');self.assertTrue(a.federal_eligible)
+        self.assertIsNone(a.customer_region)
     def test_offer_not_direct(self):self.assertEqual(item('Предлагаем рекламу, закажите у нас').signal_type,'D')
     def test_vacancy_not_contractor(self):
         o=normalize({'title':'Ищем маркетолога','url':'https://hh.ru/vacancy/123','published_at':NOW.isoformat()}, {'name':'HH','category':'vacancies'},'test',CONFIG,NOW)
