@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
 jobs:
-  research:
+  collect:
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:
@@ -26,133 +26,44 @@ jobs:
           COMPANY_URL: ${{ inputs.url }}
           MAX_PAGES: ${{ inputs.max_pages }}
         run: python -u scripts/research_company.py --url "$COMPANY_URL" --max-pages "$MAX_PAGES" --output .state/company-research.json
-      - name: Сведения страницы 1
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 0
-      - name: Сведения страницы 2
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 1
-      - name: Сведения страницы 3
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 2
-      - name: Сведения страницы 4
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 3
-      - name: Сведения страницы 5
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 4
-      - name: Сведения страницы 6
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 5
-      - name: Сведения страницы 7
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 6
-      - name: Сведения страницы 8
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 7
-      - name: Сведения страницы 9
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 8
-      - name: Сведения страницы 10
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 9
-      - name: Сведения страницы 11
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 10
-      - name: Сведения страницы 12
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 11
-      - name: Сведения страницы 13
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 12
-      - name: Сведения страницы 14
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 13
-      - name: Сведения страницы 15
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 14
-      - name: Сведения страницы 16
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 15
-      - name: Сведения страницы 17
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 16
-      - name: Сведения страницы 18
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 17
-      - name: Сведения страницы 19
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 18
-      - name: Сведения страницы 20
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 19
-      - name: Сведения страницы 21
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 20
-      - name: Сведения страницы 22
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 21
-      - name: Сведения страницы 23
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 22
-      - name: Сведения страницы 24
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 23
-      - name: Сведения страницы 25
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 24
-      - name: Сведения страницы 26
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 25
-      - name: Сведения страницы 27
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 26
-      - name: Сведения страницы 28
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 27
-      - name: Сведения страницы 29
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 28
-      - name: Сведения страницы 30
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 29
-      - name: Сведения страницы 31
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 30
-      - name: Сведения страницы 32
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 31
-      - name: Сведения страницы 33
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 32
-      - name: Сведения страницы 34
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 33
-      - name: Сведения страницы 35
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 34
-      - name: Сведения страницы 36
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 35
-      - name: Сведения страницы 37
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 36
-      - name: Сведения страницы 38
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 37
-      - name: Сведения страницы 39
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 38
-      - name: Сведения страницы 40
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 39
-      - name: Сведения страницы 41
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 40
-      - name: Сведения страницы 42
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 41
-      - name: Сведения страницы 43
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 42
-      - name: Сведения страницы 44
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 43
-      - name: Сведения страницы 45
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 44
-      - name: Сведения страницы 46
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 45
-      - name: Сведения страницы 47
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 46
-      - name: Сведения страницы 48
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 47
-      - name: Сведения страницы 49
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 48
-      - name: Сведения страницы 50
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 49
-      - name: Сведения страницы 51
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 50
-      - name: Сведения страницы 52
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 51
-      - name: Сведения страницы 53
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 52
-      - name: Сведения страницы 54
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 53
-      - name: Сведения страницы 55
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 54
-      - name: Сведения страницы 56
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 55
-      - name: Сведения страницы 57
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 56
-      - name: Сведения страницы 58
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 57
-      - name: Сведения страницы 59
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 58
-      - name: Сведения страницы 60
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 59
-      - name: Сведения страницы 61
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 60
-      - name: Сведения страницы 62
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 61
-      - name: Сведения страницы 63
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 62
-      - name: Сведения страницы 64
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 63
-      - name: Сведения страницы 65
-        run: python scripts/research_company.py --input .state/company-research.json --emit-index 64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: company-facts
+          path: .state/company-research.json
+          retention-days: 7
+          include-hidden-files: true
+  extract:
+    needs: collect
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        batch: [0,1,2,3,4,5,6,7,8,9,10,11,12]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: company-facts
+          path: .state
+      - name: Выдержки страницы 1 в группе
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: python scripts/research_company.py --input .state/company-research.json --emit-index $((BATCH * 5 + 0))
+      - name: Выдержки страницы 2 в группе
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: python scripts/research_company.py --input .state/company-research.json --emit-index $((BATCH * 5 + 1))
+      - name: Выдержки страницы 3 в группе
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: python scripts/research_company.py --input .state/company-research.json --emit-index $((BATCH * 5 + 2))
+      - name: Выдержки страницы 4 в группе
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: python scripts/research_company.py --input .state/company-research.json --emit-index $((BATCH * 5 + 3))
+      - name: Выдержки страницы 5 в группе
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: python scripts/research_company.py --input .state/company-research.json --emit-index $((BATCH * 5 + 4))

@@ -86,8 +86,8 @@ def research(base,max_pages):
                 'metrics':list(dict.fromkeys(redact(compact(n.text()))[:150] for n in main.nodes() if meaningful(n) and n.tag in ('div','span','p') and 8<len(compact(n.text()))<150 and re.search(r'\d[^.]{0,50}(?:лет|проект|объект|сотрудник|м²|м2|дней|регион|%|руб|₽)',n.text(),re.I)))[:20],
                 'specifications':[[redact(compact(c.text()))[:120] for c in row.nodes() if c.tag in ('td','th')] for row in main.nodes('tr')][:25],
                 'structure':{'main_tags':len(tree.nodes('main')),'h1_parents':[n.parent.attrs.get('class','') for n in tree.nodes('h1')][:2]},
-                'links':[l for l in links if urlsplit(l['url']).hostname not in hosts][:15],
-                'content_links':[{'url':urljoin(url,a.attrs.get('href','')),'label':redact(compact(a.text()))[:120]} for a in main.nodes('a') if meaningful(a) and compact(a.text())][:35],
+                'links':[l for l in links if urlsplit(l['url']).hostname not in hosts and urlsplit(l['url']).hostname not in ('wa.me','api.whatsapp.com')][:15],
+                'content_links':[{'url':urljoin(url,a.attrs.get('href','')),'label':redact(compact(a.text()))[:120]} for a in main.nodes('a') if meaningful(a) and compact(a.text()) and (not a.attrs.get('href','').startswith(('tel:','mailto:')) or '/contacts' in url)][:35],
                 'images':[{'alt':redact(n.attrs.get('alt',''))[:100],'url':urljoin(url,n.attrs.get('src',''))} for n in main.nodes('img') if meaningful(n) and n.attrs.get('alt')][:25],
                 'internal_links': [l for l in links if urlsplit(l['url']).hostname in hosts][:70] if completed==1 else []})
             def priority(u):
@@ -111,5 +111,6 @@ if __name__=='__main__':
         research(args.url,args.max_pages)
         if args.output:
             path=Path(args.output);path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(RECORDS,ensure_ascii=False))
+            notice(RECORDS[-1])
         else:
             for record in RECORDS:notice(record)
