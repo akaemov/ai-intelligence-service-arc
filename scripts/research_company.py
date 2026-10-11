@@ -28,7 +28,7 @@ def research(base,max_pages):
     opener=urllib.request.build_opener(Redirect());robots={};started=time.monotonic();requests=0
     def get(url):
         nonlocal requests
-        if requests>=70 or time.monotonic()-started>240:raise RuntimeError('Collection limit')
+        if requests>=110 or time.monotonic()-started>360:raise RuntimeError('Collection limit')
         if urlsplit(url).scheme!='https' or urlsplit(url).hostname not in hosts:raise ValueError('External fetch rejected')
         time.sleep(.3);requests+=1
         with opener.open(urllib.request.Request(url,headers={'User-Agent':AGENT}),timeout=12) as r:
@@ -67,6 +67,7 @@ def research(base,max_pages):
             def meaningful(n):
                 ancestor=n
                 while ancestor and ancestor.tag!='root':
+                    if ancestor.tag in ('body','html'):break
                     if ancestor.tag in ('header','nav','footer','aside') or re.search(r'(?:^|[-_ ])(?:header|menu|footer|nav|modal|popup|basket|bvi|dropdown)(?:$|[-_ ])',ancestor.attrs.get('class',''),re.I):return False
                     ancestor=ancestor.parent
                 return True
@@ -86,21 +87,27 @@ def research(base,max_pages):
                 'specifications':[[redact(compact(c.text()))[:120] for c in row.nodes() if c.tag in ('td','th')] for row in main.nodes('tr')][:25],
                 'structure':{'main_tags':len(tree.nodes('main')),'h1_parents':[n.parent.attrs.get('class','') for n in tree.nodes('h1')][:2]},
                 'links':[l for l in links if urlsplit(l['url']).hostname not in hosts][:15],
-                'internal_links': [l for l in links if urlsplit(l['url']).hostname in hosts][:150] if completed==1 else []})
+                'content_links':[{'url':urljoin(url,a.attrs.get('href','')),'label':redact(compact(a.text()))[:120]} for a in main.nodes('a') if meaningful(a) and compact(a.text())][:35],
+                'images':[{'alt':redact(n.attrs.get('alt',''))[:100],'url':urljoin(url,n.attrs.get('src',''))} for n in main.nodes('img') if meaningful(n) and n.attrs.get('alt')][:25],
+                'internal_links': [l for l in links if urlsplit(l['url']).hostname in hosts][:70] if completed==1 else []})
             def priority(u):
-                path=urlsplit(u).path
-                if re.search(r'about|company|kompanii|contact|kontakty|service|uslugi|proizvod|dokument|documents|sertifik|bim|partner|technology',path,re.I):return (0,path.count('/'))
-                return (1 if path.count('/')<=2 else 2,path.count('/'))
+                path=urlsplit(u).path;depth=path.strip('/').count('/')
+                if depth<=1 and re.search(r'company|contact|service|uslugi|landings|info|gallery|sitemap',path,re.I):return (0,depth)
+                if depth<=1:return (1,depth)
+                if re.search(r'landings|info',path,re.I):return (2,depth)
+                if re.search(r'/product/',path):return (3,depth)
+                if re.search(r'/projects/',path):return (4,depth)
+                return (5,depth)
             queue=deque(sorted(queue,key=priority))
         except Exception as e:emit({'url':url,'status':'error','error':type(e).__name__+(' HTTP '+str(e.code) if hasattr(e,'code') else '')})
-    emit({'url':base,'status':'coverage','pages':completed,'requests':requests,'remaining_urls':list(queue)[:50],'limits':{'max_pages':max_pages,'max_requests':70,'max_seconds':240}})
+    emit({'url':base,'status':'coverage','pages':completed,'requests':requests,'remaining_urls':list(queue)[:50],'limits':{'max_pages':max_pages,'max_requests':110,'max_seconds':360}})
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--url');parser.add_argument('--max-pages',type=int,default=30);parser.add_argument('--output');parser.add_argument('--input');parser.add_argument('--emit-index',type=int);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--url');parser.add_argument('--max-pages',type=int,default=60);parser.add_argument('--output');parser.add_argument('--input');parser.add_argument('--emit-index',type=int);args=parser.parse_args()
     if args.input:
         records=json.loads(Path(args.input).read_text())
         if args.emit_index<len(records):notice(records[args.emit_index])
     else:
-        if not args.url or not 1<=args.max_pages<=30:raise ValueError('Invalid collection arguments')
+        if not args.url or not 1<=args.max_pages<=60:raise ValueError('Invalid collection arguments')
         research(args.url,args.max_pages)
         if args.output:
             path=Path(args.output);path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(RECORDS,ensure_ascii=False))
