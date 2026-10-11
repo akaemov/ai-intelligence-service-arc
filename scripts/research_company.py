@@ -80,10 +80,22 @@ def research(base,max_pages):
                 if n.tag in ('p','li') and 15<len(text)<450 and (n.tag=='li' or re.search(r'компан|услуг|проект|клиент|лет|город|адрес|производ|работ|предлага|разработ|партнер|партнёр|₽|руб|Москва|Уфа|Башк',text,re.I)):
                     point=redact(text)[:180]
                     if point not in points:points.append(point)
+            sections=[]
+            for h in main.nodes():
+                if h.tag not in ('h1','h2','h3','h4') or not meaningful(h) or not h.parent:continue
+                siblings=h.parent.children;index=siblings.index(h);texts=[]
+                for n in siblings[index+1:index+5]:
+                    if isinstance(n,str):text=compact(n)
+                    else:
+                        if n.tag in ('h1','h2','h3','h4'):break
+                        text=compact(n.text())
+                    if text:texts.append(text)
+                if texts:sections.append({'heading':redact(compact(h.text()))[:150],'excerpt':redact(' '.join(texts))[:280]})
             emit({'url':url,'status':'ok','title':[n.text()[:200] for n in tree.nodes('title')][:1],
                 'descriptions':list(dict.fromkeys(descriptions)),'headings':list(dict.fromkeys(headings))[:30],
                 'points':points[:18],'excerpt':redact(compact(main.text()))[:280],
                 'metrics':list(dict.fromkeys(redact(compact(n.text()))[:150] for n in main.nodes() if meaningful(n) and n.tag in ('div','span','p') and 8<len(compact(n.text()))<150 and re.search(r'\d[^.]{0,50}(?:лет|проект|объект|сотрудник|м²|м2|дней|регион|%|руб|₽)',n.text(),re.I)))[:20],
+                'section_context':sections[:15],
                 'specifications':[[redact(compact(c.text()))[:120] for c in row.nodes() if c.tag in ('td','th')] for row in main.nodes('tr')][:25],
                 'structure':{'main_tags':len(tree.nodes('main')),'h1_parents':[n.parent.attrs.get('class','') for n in tree.nodes('h1')][:2]},
                 'links':[l for l in links if urlsplit(l['url']).hostname not in hosts and urlsplit(l['url']).hostname not in ('wa.me','api.whatsapp.com')][:15],
