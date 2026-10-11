@@ -9,12 +9,14 @@ from src.collectors.dom import DOM
 from src.models import redact
 AGENT='PublicCompanyResearch/1.0 (+https://github.com/akaemov/ai-intelligence-service-arc)'
 def compact(value):return ' '.join(value.split())
-def emit(value):
+RECORDS=[]
+def notice(value):
     payload=json.dumps(value,ensure_ascii=False)
     pieces=[payload[i:i+1800] for i in range(0,len(payload),1800)]
     for index,piece in enumerate(pieces):
         data=json.dumps({'url':value.get('url'),'part':index,'parts':len(pieces),'data':piece},ensure_ascii=False)
         print('::notice title=Company research::'+data.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)
+def emit(value):RECORDS.append(value)
 def research(base,max_pages):
     host=urlsplit(base).hostname
     if not host or urlsplit(base).scheme!='https':raise ValueError('HTTPS homepage required')
@@ -61,21 +63,45 @@ def research(base,max_pages):
                 if not any(x['url']==href for x in links):links.append({'url':href,'label':redact(compact(a.text()))[:100]})
                 if u.scheme=='https' and u.hostname in hosts and not u.query and not re.search(r'\.(?:jpg|png|pdf|zip|svg|webp|mp4|css|js)$|/wp-|/feed/|/login|/admin',u.path,re.I):
                     if href not in seen and href not in queue:queue.append(href)
-            headings=[redact(compact(n.text()))[:150] for n in tree.nodes() if n.tag in ('h1','h2','h3','h4')]
+            main=next(iter(tree.nodes('main')),tree)
+            def meaningful(n):
+                ancestor=n
+                while ancestor and ancestor.tag!='root':
+                    if ancestor.tag in ('header','nav','footer','aside') or re.search(r'(?:^|[-_ ])(?:header|menu|footer|nav|modal|popup|basket|bvi|dropdown)(?:$|[-_ ])',ancestor.attrs.get('class',''),re.I):return False
+                    ancestor=ancestor.parent
+                return True
+            headings=[redact(compact(n.text()))[:150] for n in main.nodes() if n.tag in ('h1','h2','h3','h4') and meaningful(n)]
             descriptions=[redact(n.attrs.get('content',''))[:350] for n in tree.nodes('meta') if (n.attrs.get('name') or n.attrs.get('property')) in ('description','og:description')]
             points=[]
-            for n in tree.nodes():
+            for n in main.nodes():
+                if not meaningful(n):continue
                 text=compact(n.text())
                 if n.tag in ('p','li') and 15<len(text)<450 and (n.tag=='li' or re.search(r'компан|услуг|проект|клиент|лет|город|адрес|производ|работ|предлага|разработ|партнер|партнёр|₽|руб|Москва|Уфа|Башк',text,re.I)):
                     point=redact(text)[:180]
                     if point not in points:points.append(point)
             emit({'url':url,'status':'ok','title':[n.text()[:200] for n in tree.nodes('title')][:1],
                 'descriptions':list(dict.fromkeys(descriptions)),'headings':list(dict.fromkeys(headings))[:30],
-                'points':points[:18],'excerpt':redact(compact(tree.text()))[:280],
-                'links':links[:55] if completed==1 else links[:20]})
+                'points':points[:18],'excerpt':redact(compact(main.text()))[:280],
+                'specifications':[[redact(compact(c.text()))[:120] for c in row.nodes() if c.tag in ('td','th')] for row in main.nodes('tr')][:25],
+                'structure':{'main_tags':len(tree.nodes('main')),'h1_parents':[n.parent.attrs.get('class','') for n in tree.nodes('h1')][:2]},
+                'links':[l for l in links if urlsplit(l['url']).hostname not in hosts][:15],
+                'internal_links': [l for l in links if urlsplit(l['url']).hostname in hosts][:150] if completed==1 else []})
+            def priority(u):
+                path=urlsplit(u).path
+                if re.search(r'about|company|kompanii|contact|kontakty|service|uslugi|proizvod|dokument|documents|sertifik|bim|partner|technology',path,re.I):return (0,path.count('/'))
+                return (1 if path.count('/')<=2 else 2,path.count('/'))
+            queue=deque(sorted(queue,key=priority))
         except Exception as e:emit({'url':url,'status':'error','error':type(e).__name__+(' HTTP '+str(e.code) if hasattr(e,'code') else '')})
     emit({'url':base,'status':'coverage','pages':completed,'requests':requests,'remaining_urls':list(queue)[:50],'limits':{'max_pages':max_pages,'max_requests':70,'max_seconds':240}})
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--url',required=True);parser.add_argument('--max-pages',type=int,default=20);args=parser.parse_args()
-    if not 1<=args.max_pages<=30:raise ValueError('Invalid page count')
-    research(args.url,args.max_pages)
+    parser=argparse.ArgumentParser();parser.add_argument('--url');parser.add_argument('--max-pages',type=int,default=30);parser.add_argument('--output');parser.add_argument('--input');parser.add_argument('--emit-index',type=int);args=parser.parse_args()
+    if args.input:
+        records=json.loads(Path(args.input).read_text())
+        if args.emit_index<len(records):notice(records[args.emit_index])
+    else:
+        if not args.url or not 1<=args.max_pages<=30:raise ValueError('Invalid collection arguments')
+        research(args.url,args.max_pages)
+        if args.output:
+            path=Path(args.output);path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(RECORDS,ensure_ascii=False))
+        else:
+            for record in RECORDS:notice(record)
