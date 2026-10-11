@@ -1,0 +1,82 @@
+[
+  {
+    "id": "search",
+    "name": "Поисковые системы",
+    "status": "not_connected"
+  },
+  {
+    "id": "search_statistics",
+    "name": "Статистика запросов",
+    "status": "not_connected"
+  },
+  {
+    "id": "media",
+    "name": "СМИ",
+    "status": "implemented"
+  },
+  {
+    "id": "surveys",
+    "name": "Опросы",
+    "status": "not_connected"
+  },
+  {
+    "id": "official_data",
+    "name": "Официальные данные",
+    "status": "not_connected"
+  },
+  {
+    "id": "social",
+    "name": "Публичные соцсети",
+    "status": "not_connected"
+  },
+  {
+    "id": "discussions",
+    "name": "Публичные обсуждения",
+    "status": "not_connected"
+  },
+  {
+    "id": "companies",
+    "name": "Сайты компаний",
+    "status": "not_connected"
+  },
+  {
+    "id": "associations",
+    "name": "Бизнес-объединения",
+    "status": "not_connected"
+  },
+  {
+    "id": "directories",
+    "name": "Каталоги организаций",
+    "status": "not_connected"
+  },
+  {
+    "id": "maps_reviews",
+    "name": "Карты и отзывы",
+    "status": "not_connected"
+  },
+  {
+    "id": "classifieds",
+    "name": "Объявления",
+    "status": "not_connected"
+  },
+  {
+    "id": "requests",
+    "name": "Запросы исполнителей",
+    "status": "implemented"
+  },
+  {
+    "id": "procurement",
+    "name": "Закупки",
+    "status": "implemented"
+  },
+  {
+    "id": "vacancies",
+    "name": "Вакансии",
+    "status": "implemented"
+  },
+  {
+    "id": "aggregators",
+    "name": "Агрегаторы",
+    "status": "not_connected"
+  }
+]

@@ -1,19 +1,121 @@
 {
-  "region": "Республика Башкортостан",
-  "cities": ["Уфа", "Стерлитамак", "Салават", "Нефтекамск", "Октябрьский", "Белорецк", "Ишимбай", "Туймазы", "Кумертау", "Бирск"],
+  "mode": "russia",
+  "regions": [],
+  "cities": [],
+  "industries": [],
+  "segments": [
+    "business",
+    "government",
+    "unknown"
+  ],
   "days": 90,
   "compare_days": 90,
-  "services": ["marketing", "advertising", "ai", "research"],
-  "groups": ["vacancies", "media", "procurement"],
-  "max_requests": 30,
-  "max_pages": 10,
-  "max_seconds": 180,
+  "services": [
+    "marketing",
+    "advertising",
+    "ai",
+    "research"
+  ],
+  "groups": [
+    "requests",
+    "procurement",
+    "vacancies",
+    "media"
+  ],
+  "max_requests": 80,
+  "max_pages": 30,
+  "max_seconds": 360,
+  "per_region_observations": 50,
+  "per_source_pages": 5,
+  "per_source_requests": 14,
   "max_api_budget": 0,
-  "llm": {"enabled": false, "provider": null, "model": null},
+  "llm": {
+    "enabled": false,
+    "provider": "openai-compatible",
+    "model": null,
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "usd_per_million_input": null,
+    "usd_per_million_output": null,
+    "max_observations": 10
+  },
   "sources": [
-    {"id": "hh", "name": "HeadHunter", "url": "https://api.hh.ru", "category": "vacancies", "coverage": "регион из актуального справочника /areas", "access": "official_api", "authorization": false, "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL"},
-    {"id": "bashinform", "name": "Башинформ", "url": "https://www.bashinform.ru/", "category": "media", "coverage": "Башкортостан; проверяется по каждому материалу", "access": "rss_discovery", "authorization": false, "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки"},
-    {"id": "rbc", "name": "РБК", "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss", "category": "media", "coverage": "Россия; без регионального основания только контекст", "access": "rss", "authorization": false, "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки"},
-    {"id": "eis", "name": "ЕИС закупки", "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html", "category": "procurement", "coverage": "Россия; регион подтверждается текстом карточки", "access": "public_html", "authorization": false, "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса"}
+    {
+      "id": "workspace",
+      "name": "Workspace — публичные задания",
+      "url": "https://workspace.ru/",
+      "category": "requests",
+      "operator": "workspace",
+      "scope": "federal",
+      "coverage": "Публичные ссылки на задания; регион заказчика неизвестен без явного поля",
+      "access": "public_homepage",
+      "authorization": false,
+      "restrictions": "robots.txt запрещает индекс /tenders/; читается только разрешённая главная, запрещённые карточки не запрашиваются",
+      "sector_coverage": "Маркетинг, реклама, разработки и аналитика; тематический фильтр"
+    },
+    {
+      "id": "weblancer",
+      "name": "Weblancer — публичные заказы",
+      "url": "https://www.weblancer.net/",
+      "category": "requests",
+      "operator": "weblancer",
+      "scope": "interregional",
+      "coverage": "Международная площадка; включение в РФ только с подтверждением",
+      "access": "public_html",
+      "authorization": false,
+      "restrictions": "Только страницы, разрешённые robots.txt; без профилей, контактов и закрытых заказов",
+      "sector_coverage": "Задания по словарю маркетинга, рекламы, ИИ, исследований"
+    },
+    {
+      "id": "hh",
+      "name": "HeadHunter",
+      "url": "https://api.hh.ru",
+      "category": "vacancies",
+      "coverage": "Россия; территориальные ID из /areas, не взаимозаменяемы с другими системами",
+      "access": "official_api",
+      "authorization": false,
+      "restrictions": "Публичный API; условия https://dev.hh.ru; хранить только короткие заголовки и публичные URL",
+      "operator": "hh",
+      "scope": "federal",
+      "sector_coverage": "Указанные направления; фильтр по словарю"
+    },
+    {
+      "id": "bashinform",
+      "name": "Башинформ",
+      "url": "https://www.bashinform.ru/",
+      "category": "media",
+      "coverage": "Башкортостан; проверяется по каждому материалу",
+      "access": "rss_discovery",
+      "authorization": false,
+      "restrictions": "robots.txt; RSS только после обнаружения в HTML; короткие выдержки",
+      "operator": "bashinform",
+      "scope": "regional",
+      "sector_coverage": "Указанные направления; фильтр по словарю"
+    },
+    {
+      "id": "rbc",
+      "name": "РБК",
+      "url": "https://rssexport.rbc.ru/rbcnews/news/30/full.rss",
+      "category": "media",
+      "coverage": "Россия; без регионального основания только контекст",
+      "access": "rss",
+      "authorization": false,
+      "restrictions": "Проверка доступности официального RSS и robots.txt; короткие заголовки",
+      "operator": "rbc",
+      "scope": "federal",
+      "sector_coverage": "Указанные направления; фильтр по словарю"
+    },
+    {
+      "id": "eis",
+      "name": "ЕИС закупки",
+      "url": "https://zakupki.gov.ru/epz/order/extendedsearch/results.html",
+      "category": "procurement",
+      "coverage": "Россия; регион подтверждается текстом карточки",
+      "access": "public_html",
+      "authorization": false,
+      "restrictions": "robots.txt; без обхода CAPTCHA; статус и регион проверяются, если не извлечены — материал исключается из прямого спроса",
+      "operator": "eis",
+      "scope": "federal",
+      "sector_coverage": "Указанные направления; фильтр по словарю"
+    }
   ]
 }

@@ -1,88 +1,99 @@
+import json
 import re
 import uuid
-from datetime import datetime, timezone
-from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
-from src.models import Observation, digest, redact
+from pathlib import Path
+from datetime import datetime,timezone
+from urllib.parse import urlsplit,urlunsplit,parse_qsl,urlencode
+from src.models import Observation,digest,redact
 
-LEXICON = {
- 'marketing': ['маркетинг', 'маркетолог', 'лидогенерац', 'целевую аудитори', 'позиционирован', 'дорогие заявки'],
- 'advertising': ['реклам', 'таргет', 'контекстн', 'продвижени'],
- 'ai': ['искусственн', 'чат-бот', 'чатбот', 'ии-агент', 'внедрение ии', 'автоматиз', 'нейросет'],
- 'research': ['анализ рынка', 'анализ конкурент', 'исследован', 'swot', 'собрать цены']
-}
-INTENT = re.compile(r'ищем (?:подрядчика|исполнителя)|нужен подрядчик|заказать |запрос коммерческ|требуется анализ рынка|ищем маркетолога|нужен чат-бот', re.I)
-OFFER = re.compile(r'предлагаем|наши услуги|оказываем|наше агентство|закажите у нас', re.I)
+DICTIONARY=json.loads((Path(__file__).resolve().parents[2]/'config/dictionary.json').read_text())
+LEXICON=DICTIONARY['services']
+INTENT=re.compile('|'.join(re.escape(x) for x in DICTIONARY['intent']),re.I)
+OFFER=re.compile(r'предлагаем|наши услуги|оказываем|наше агентство|закажите у нас',re.I)
 
 def canonical(url):
-    u = urlsplit(url)
-    query = [(k,v) for k,v in parse_qsl(u.query) if not k.startswith('utm_') and k not in ('fbclid','yclid')]
-    return urlunsplit((u.scheme, u.netloc.lower(), u.path or '/', urlencode(sorted(query)), ''))
+    u=urlsplit(url)
+    query=[(k,v) for k,v in parse_qsl(u.query) if not k.startswith('utm_') and k not in ('fbclid','yclid','erid')]
+    return urlunsplit((u.scheme,u.netloc.lower(),u.path or '/',urlencode(sorted(query)),''))
 
-def classify(title, kind):
-    if kind == 'vacancies': return 'C', 'vacancy'
-    if OFFER.search(title): return 'D', None
-    # Procurement cards need independently verified status, intent and geography before A.
-    if kind == 'media': return 'E', None
-    if INTENT.search(title): return 'A', None
-    if any(term in title.lower() for term in ['не приносит клиентов', 'дорогие заявки']): return 'C', None
-    return 'E', None
+def classify(text,kind,request_verified=False):
+    if kind=='vacancies':return 'C','vacancy'
+    if OFFER.search(text):return 'D',None
+    if request_verified:return 'A',None
+    if kind=='media':return 'E',None
+    if INTENT.search(text):return 'A',None
+    if any(p in text.lower() for p in DICTIONARY['problems']):return 'C',None
+    return 'E',None
 
-def normalize(raw, source, run_id, config, now):
-    title = re.sub(r'\s+', ' ', raw['title']).strip()
-    category = next((k for k,terms in LEXICON.items() if any(t in title.lower() for t in terms)), None)
-    signal, subtype = classify(title, source['category'])
-    region = None
-    city = None
-    geo = raw.get('geography_evidence')
-    if geo and raw.get('verified_region') == config['region']:
-        region = config['region']; city = raw.get('city')
-    # News mentioning a city or an author's address is not a regional demand proof.
-    if source['category'] == 'media' and re.search('башкортостан|башкири', title, re.I):
-        region = config['region']; geo = 'Территория события явно упомянута в заголовке (только контекст)'
-    status = raw.get('procurement_status')
-    if source['category']=='procurement' and status=='active' and region and geo and not OFFER.search(title):signal='A'
-    if signal == 'A' and (not geo or not region or (source['category'] == 'procurement' and status != 'active')):
-        signal = 'E'
-    if not category: signal = 'F'
-    published = raw.get('published_at')
-    limitations = ['Автоматическая классификация; необходима ручная проверка перед коммерческим решением']
+def normalize(raw,source,run_id,config,now):
+    title=re.sub(r'\s+',' ',raw['title']).strip()
+    source_text=title+' '+raw.get('evidence_text','')
+    category=next((k for k,terms in LEXICON.items() if any(t in source_text.lower() for t in terms)),None)
+    signal,subtype=classify(source_text,source['category'],raw.get('request_verified',False))
+    status=raw.get('procurement_status')
+    if source['category']=='procurement' and status=='active' and raw.get('request_verified') and not OFFER.search(source_text):signal='A'
+    if source['category']=='procurement' and (status!='active' or not raw.get('request_verified')) and signal=='A':signal='E'
+    if not category:signal='F'
+    geo=raw.get('geography_evidence');country=raw.get('country')
+    customer_region=raw.get('customer_region');customer_city=raw.get('customer_city')
+    # Compatibility only for explicitly verified collector fields, never city words in text.
+    if raw.get('verified_region') and geo:
+        customer_region=raw['verified_region'];customer_city=raw.get('city');country='Россия'
+    if not geo:country=None;customer_region=None;customer_city=None
+    published=raw.get('published_at')
+    limitations=['Автоматическая классификация; перед коммерческим решением проверьте первоисточник']
     if raw.get('date_basis'):limitations.append('Основание даты: '+raw['date_basis'])
-    if 'erid=' in raw['url']:limitations.append('URL содержит рекламную маркировку erid; публикация не доказательство покупательского намерения')
-    if not published: limitations.append('Дата публикации неизвестна; исключено из показателей периода')
-    if not region: limitations.append('Нет подтверждённой региональной связи')
-    if subtype == 'vacancy': limitations.append('Потребность в сотруднике, не заказ внешнему исполнителю; зарплата не бюджет услуги')
-    if raw.get('language', 'ru') != 'ru': limitations.append('Качественный перевод не подключён; исключено из показателей')
-    eligible = bool(region and geo and category in config['services'] and published and raw.get('language', 'ru') == 'ru')
+    if 'erid=' in raw['url']:limitations.append('Рекламная маркировка: материал не подтверждает покупательское намерение')
+    if not published:limitations.append('Дата неизвестна; материал исключён из показателей периода')
+    if country!='Россия':limitations.append('Связь с российским рынком не подтверждена; вне федеральных показателей')
+    if not customer_region:limitations.append('Регион заказчика не установлен; не включён в региональные показатели')
+    if subtype=='vacancy':limitations.append('Вакансия — потребность в компетенциях, не заказ подрядчику; зарплата не бюджет услуги')
+    language=raw.get('language','ru')
+    if language!='ru':limitations.append('Качественный перевод не подключён')
+    in_period=False
     if published:
-        date = datetime.fromisoformat(published)
-        if date.tzinfo is None: date = date.replace(tzinfo=timezone.utc)
-        age = (now - date).total_seconds() / 86400
-        eligible = eligible and 0 <= age <= config['days']
-        if not 0 <= age <= config['days']: limitations.append('Вне исследуемого периода')
-    excerpt = redact(title)[:280]
-    url = canonical(raw['url'])
-    item = Observation(
-        observation_id=str(uuid.uuid5(uuid.NAMESPACE_URL, url)), run_id=run_id,
-        source_name=source['name'], source_type=source['category'], source_url=url, canonical_url=url,
-        title=redact(title)[:400], published_at=published, collected_at=now.isoformat(), original_language=raw.get('language','ru'),
-        region=region, city_or_district=city, geography_evidence=geo, organization_name=None,
-        customer_segment='business' if subtype == 'vacancy' else raw.get('customer_segment'), industry=None,
-        service_category=category, signal_type=signal, customer_problem=None,
-        requested_service=excerpt if signal == 'A' else None,
-        explicit_budget=None, currency=None, budget_basis=None, price_type=None, procurement_status=status,
-        short_evidence_excerpt=excerpt, factual_summary=excerpt, analyst_interpretation=None,
-        confidence_level='medium' if eligible else 'low', confidence_reason='Заголовок и метаданные источника; покупательское намерение не выводится из популярности',
-        content_hash=digest(title), duplicate_group_id=None, limitations=limitations,
-        signal_subtype=subtype, regional_eligible=eligible)
+        dt=datetime.fromisoformat(published)
+        if dt.tzinfo is None:dt=dt.replace(tzinfo=timezone.utc)
+        in_period=0<=(now-dt).total_seconds()/86400<=config['days']
+        if not in_period:limitations.append('Вне исследуемого периода')
+    selected=not config.get('regions') or customer_region in config['regions']
+    selected=selected and (not config.get('cities') or customer_city in config['cities'])
+    sector=not config.get('industries') or raw.get('industry') in config['industries']
+    scope_ok=(config.get('mode','russia')=='russia' or selected) and sector
+    eligible=country=='Россия' and bool(geo) and category in config['services'] and in_period and language=='ru' and scope_ok
+    if config.get('regions') and not selected:limitations.append('Не относится к выбранной географии')
+    if not sector:limitations.append('Отрасль не подтверждена или вне выбранного фильтра')
+    excerpt=redact(re.sub(r'\s+',' ',raw.get('evidence_text') or title).strip())[:280]
+    url=canonical(raw['url'])
+    budget=raw.get('explicit_budget')
+    if budget is not None and (not raw.get('budget_basis') or not raw.get('price_type')):budget=None
+    problem=next((p for p in DICTIONARY['problems'] if p in source_text.lower()),None)
+    item=Observation(
+      observation_id=str(uuid.uuid5(uuid.NAMESPACE_URL,raw.get('event_id') or url)),run_id=run_id,
+      source_name=source['name'],source_type=source['category'],source_url=url,canonical_url=url,title=redact(title)[:400],
+      published_at=published,collected_at=now.isoformat(),original_language=language,region=customer_region,city_or_district=customer_city,
+      geography_evidence=redact(geo) if geo else None,organization_name=raw.get('organization_name'),
+      customer_segment=raw.get('customer_segment'),industry=raw.get('industry'),service_category=category,signal_type=signal,
+      customer_problem=problem,requested_service=redact(title)[:280] if signal=='A' else None,
+      explicit_budget=float(budget) if budget is not None else None,currency=raw.get('currency') if budget is not None else None,
+      budget_basis=redact(raw['budget_basis']) if budget is not None else None,price_type=raw.get('price_type') if budget is not None else None,
+      procurement_status=status,short_evidence_excerpt=excerpt,factual_summary=excerpt,analyst_interpretation=None,
+      confidence_level='medium' if eligible else 'low',confidence_reason='Проверяемые поля источника; сила сигнала отделена от надёжности источника',
+      content_hash=digest(title+' '+excerpt),duplicate_group_id=None,limitations=limitations,signal_subtype=subtype,
+      regional_eligible=bool(eligible and customer_region and selected),country=country,federal_district=raw.get('federal_district'),
+      customer_region=customer_region,customer_city=customer_city,execution_geography=raw.get('execution_geography'),
+      target_market_geography=raw.get('target_market_geography'),contractor_search_geography=raw.get('contractor_search_geography'),
+      remote_delivery=raw.get('remote_delivery'),organization_size=raw.get('organization_size'),geography_details=raw.get('geography_details'),
+      federal_eligible=bool(eligible),event_id=raw.get('event_id'),requirements=redact(raw['requirements'])[:280] if raw.get('requirements') else None,
+      dictionary_version=DICTIONARY['version'])
     return item.validate()
 
 def deduplicate(items):
-    unique=[]; hashes={}; urls={}; duplicates=0
+    unique=[];events={};hashes={};urls={};duplicates=0
     for item in items:
-        previous = hashes.get(item.content_hash) or urls.get(item.canonical_url)
-        if previous:
-            item.duplicate_group_id = previous.observation_id
-            duplicates += 1
+        previous=(events.get(item.event_id) if item.event_id else None) or urls.get(item.canonical_url) or hashes.get(item.content_hash)
+        if previous:item.duplicate_group_id=previous.observation_id;duplicates+=1
         else:
-            unique.append(item); hashes[item.content_hash]=item; urls[item.canonical_url]=item
-    return unique, duplicates
+            unique.append(item);hashes[item.content_hash]=item;urls[item.canonical_url]=item
+            if item.event_id:events[item.event_id]=item
+    return unique,duplicates

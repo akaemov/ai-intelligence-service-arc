@@ -48,6 +48,20 @@ class Observation:
     signal_subtype: str | None = None
     survey: dict | None = None
     regional_eligible: bool = False
+    country: str | None = None
+    federal_district: str | None = None
+    customer_region: str | None = None
+    customer_city: str | None = None
+    execution_geography: str | None = None
+    target_market_geography: str | None = None
+    contractor_search_geography: str | None = None
+    remote_delivery: bool | None = None
+    organization_size: str | None = None
+    geography_details: dict | None = None
+    federal_eligible: bool = False
+    event_id: str | None = None
+    requirements: str | None = None
+    dictionary_version: str | None = None
     def validate(self):
         for name, hint in get_type_hints(type(self)).items():
             value=getattr(self,name)
@@ -72,12 +86,14 @@ class Observation:
             datetime.fromisoformat(self.published_at)
         if self.explicit_budget is not None and (self.explicit_budget < 0 or not self.budget_basis or not self.price_type):
             raise ValueError('budget requires evidence and type')
-        if self.signal_type == 'A' and (not self.geography_evidence or not self.requested_service):
+        if self.signal_type == 'A' and not self.requested_service:
             raise ValueError('direct demand requires evidence')
         if self.signal_subtype == 'vacancy' and self.signal_type == 'A':
             raise ValueError('vacancy cannot be direct demand')
-        if self.regional_eligible and not (self.region and self.geography_evidence and self.published_at and self.service_category):
+        if self.regional_eligible and not (self.customer_region and self.country=='Россия' and self.geography_evidence and self.published_at and self.service_category):
             raise ValueError('regional metric lacks provenance')
+        if self.federal_eligible and not (self.country=='Россия' and self.geography_evidence and self.published_at and self.service_category):raise ValueError('Federal metric lacks provenance')
+        if self.customer_segment not in (None,'business','government','individual'):raise ValueError('Unknown customer segment')
         if len(self.short_evidence_excerpt) > 280:
             raise ValueError('excerpt too long')
         return self

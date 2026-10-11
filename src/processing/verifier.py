@@ -4,7 +4,7 @@ from src.models import redact
 
 def verify(observation,raw):
     observation.validate()
-    evidence=redact(re.sub(r'\s+',' ',raw['title']).strip())[:280]
+    evidence=redact(re.sub(r'\s+',' ',raw.get('evidence_text') or raw['title']).strip())[:280]
     if observation.short_evidence_excerpt!=evidence:
         raise ValueError('Excerpt does not match source fact')
     if observation.factual_summary!=observation.short_evidence_excerpt:
