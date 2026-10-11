@@ -9,7 +9,7 @@ class Parser(HTMLParser):
   a=dict(attrs)
   for c in a.get('class','').split():self.classes[c]=self.classes.get(c,0)+1
   if tag=='a':self.href=a.get('href');self.text=[]
-  if tag=='meta' and a.get('property'):self.meta[a['property']]=a.get('content','')[:150]
+  if tag=='meta' and a.get('property') in ('og:title','og:type'):self.meta[a['property']]=a.get('content','')[:150]
  def handle_data(self,t):
   if self.href:self.text.append(t)
  def handle_endtag(self,tag):
@@ -50,4 +50,6 @@ def inspect(base):
  except Exception as e:report['error']=type(e).__name__+(' HTTP '+str(e.code) if hasattr(e,'code') else '')
  return report
 for base in ['https://workspace.ru/','https://www.b2b-center.ru/','https://www.fl.ru/','https://www.weblancer.net/','https://trudvsem.ru/']:
- print(json.dumps(inspect(base),ensure_ascii=False),flush=True)
+ result=json.dumps(inspect(base),ensure_ascii=False)
+ print(result,flush=True)
+ print('::notice title=Source discovery::'+result.replace('%','%25').replace('\r','%0D').replace('\n','%0A'),flush=True)

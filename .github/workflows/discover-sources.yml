@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [.github/workflows/discover-sources.yml]
+    paths: [.github/workflows/discover-sources.yml, scripts/discover_sources.py]
 permissions:
   contents: read
 jobs:
